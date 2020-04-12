@@ -18,7 +18,7 @@ int main(void)
             if (quarters > 0)
             {
                 coins += quarters;
-                cents = cents - ( quarters * 25);
+                cents = cents - (quarters * 25);
             }
 
             int dimes = cents / 10;
@@ -44,5 +44,5 @@ int main(void)
             printf("%i\n", coins);
         }
     }
-    while(dollar < 0.00);
+    while (dollar < 0.00);
 }
