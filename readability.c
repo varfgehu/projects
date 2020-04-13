@@ -27,7 +27,7 @@ int main(void)
     int num_of_sentences = count_sentences(text);
 
     //calculate averages
-    float average_letter = calculate_l( num_of_letters, num_of_words);
+    float average_letter = calculate_l(num_of_letters, num_of_words);
     float average_sentence = calculate_s(num_of_sentences, num_of_words);
 
     //calculate index
@@ -41,9 +41,9 @@ int main(void)
 int count_letters(string text)
 {
     int num_of_letters = 0;
-    for (int i = 0, length = strlen(text); i < length + 1; i++ )
+    for (int i = 0, length = strlen(text); i < length + 1; i++)
     {
-        if ( ( text[i] >= 'a' && text[i] <= 'z' ) || ( text[i] >= 'A' && text[i] <= 'Z' ) )
+        if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z'))
         {
             num_of_letters++;
         }
@@ -57,10 +57,10 @@ int count_words(string text)
 {
     int num_of_words = 0;
     bool word_found = false;
-    for (int i = 0, length = strlen(text); i < length + 1; i++ )
+    for (int i = 0, length = strlen(text); i < length + 1; i++)
     {
         //find the begining of a word
-        if ( ( text[i] >= 'a' && text[i] <= 'z' ) || ( text[i] >= 'A' && text[i] <= 'Z' ) )
+        if ((text[i] >= 'a' && text[i] <= 'z') || (text[i] >= 'A' && text[i] <= 'Z'))
         {
             if (word_found == false)
             {
@@ -69,7 +69,7 @@ int count_words(string text)
 
             word_found = true;
         }
-        else if ( text[i] == ' ')
+        else if (text[i] == ' ')
         {
             word_found = false;
         }
@@ -83,9 +83,9 @@ int count_words(string text)
 int count_sentences(string text)
 {
     int num_of_sentences = 0;
-    for (int i = 0, length = strlen(text); i < length + 1; i++ )
+    for (int i = 0, length = strlen(text); i < length + 1; i++)
     {
-        if ( text[i] == '.' || text[i] == '!' || text[i] == '?' )
+        if (text[i] == '.' || text[i] == '!' || text[i] == '?')
         {
             num_of_sentences++;
         }
@@ -97,17 +97,17 @@ int count_sentences(string text)
 
 float calculate_l(float letters, float words)
 {
-    return ( ((float)letters / (float)words ) * 100.0);
+    return (((float)letters / (float)words) * 100.0);
 }
 
 float calculate_s(float sentences, float words)
 {
-    return ( (float)sentences / (float)words) * 100.0;
+    return ((float)sentences / (float)words) * 100.0;
 }
 
 int calculate_index(float average_letter, float average_sentence)
 {
-    return round( (0.0588 * average_letter) - (0.296 * average_sentence) - 15.8);
+    return round((0.0588 * average_letter) - (0.296 * average_sentence) - 15.8);
 }
 
 void print_grade(int index)
