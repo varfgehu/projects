@@ -1,6 +1,7 @@
 #include <cs50.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 // Max voters and candidates
 #define MAX_VOTERS 100
@@ -170,9 +171,11 @@ int return_valid_vote_from_voter(int voter)
 // Print the winner of the election, if there is one
 bool print_winner(void)
 {
-    for(int candidate = 0; candidate < candidate_count; candidate++ )
+    for (int candidate = 0; candidate < candidate_count; candidate++ )
     {
-        if( (float)candidates[candidate].votes / (float)candidate_count > 0.5)
+        int vote_needed =  ceil( (float)voter_count / 2.0 );
+
+        if( candidates[candidate].votes >= vote_needed )
         {
             printf("%s\n", candidates[candidate].name);
             return true;
@@ -187,9 +190,9 @@ int find_min(void)
 {
     int min_candidate = voter_count;
 
-    for (int i = 0; i < voter_count; i++)
+    for (int i = 0; i < candidate_count; i++)
     {
-        if(min_candidate <= candidates[i].votes)
+        if(min_candidate >= candidates[i].votes)
         {
             min_candidate = candidates[i].votes;
         }
