@@ -173,8 +173,6 @@ bool print_winner(void)
 {
     for (int candidate = 0; candidate < candidate_count; candidate++ )
     {
-        //int vote_needed =  ceil( (float)voter_count / 2.0 );
-
         if( candidates[candidate].votes > (float)voter_count / 2.0 )
         {
             printf("%s\n", candidates[candidate].name);
@@ -192,7 +190,7 @@ int find_min(void)
 
     for (int i = 0; i < candidate_count; i++)
     {
-        if(min_candidate >= candidates[i].votes)
+        if(candidates[i].eliminated != true && min_candidate >= candidates[i].votes)
         {
             min_candidate = candidates[i].votes;
         }
