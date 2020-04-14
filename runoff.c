@@ -146,7 +146,7 @@ bool vote(int voter, int rank, string name)
 // Tabulate votes for non-eliminated candidates UPDATE VOTE COUNTES
 void tabulate(void)
 {
-    for( int voter = 0; voter < voter_count; voter++)
+    for (int voter = 0; voter < voter_count; voter++)
     {
         int vote = return_valid_vote_from_voter(voter);
 
@@ -159,7 +159,7 @@ int return_valid_vote_from_voter(int voter)
 {
     for (int candidate = 0; candidate < candidate_count; candidate++)
     {
-        if(false == candidates[preferences[voter][candidate]].eliminated)
+        if (false == candidates[preferences[voter][candidate]].eliminated)
         {
             return preferences[voter][candidate];
         }
@@ -171,9 +171,9 @@ int return_valid_vote_from_voter(int voter)
 // Print the winner of the election, if there is one
 bool print_winner(void)
 {
-    for (int candidate = 0; candidate < candidate_count; candidate++ )
+    for (int candidate = 0; candidate < candidate_count; candidate++)
     {
-        if( candidates[candidate].votes > (float)voter_count / 2.0 )
+        if (candidates[candidate].votes > (float)voter_count / 2.0)
         {
             printf("%s\n", candidates[candidate].name);
             return true;
@@ -190,7 +190,7 @@ int find_min(void)
 
     for (int i = 0; i < candidate_count; i++)
     {
-        if(candidates[i].eliminated != true && min_candidate >= candidates[i].votes)
+        if (candidates[i].eliminated != true && min_candidate >= candidates[i].votes)
         {
             min_candidate = candidates[i].votes;
         }
@@ -203,7 +203,7 @@ bool is_tie(int min)
 {
     for (int i = 0; i < candidate_count; i++)
     {
-        if(min != candidates[i].votes && false == candidates[i].eliminated)
+        if (min != candidates[i].votes && false == candidates[i].eliminated)
         {
             return false;
         }
