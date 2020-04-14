@@ -172,7 +172,7 @@ bool print_winner(void)
 {
     float max = 0.0;
 
-    for (int i = 0; i < voter_count ; i++ )
+    for (int i = 0; i < candidate_count ; i++ )
     {
         if (candidates[i].votes / voter_count > 0.5)
         {
