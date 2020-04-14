@@ -22,7 +22,6 @@ int candidate_count;
 // Function prototypes
 bool vote(string name);
 void print_winner(void);
-int get_max_point(void);
 
 int main(int argc, string argv[])
 {
@@ -67,16 +66,12 @@ int main(int argc, string argv[])
 // Update vote totals given a new vote
 bool vote(string name)
 {
-    for(int i = 0, candidate_number = sizeof(candidates) / sizeof(candidate); i < candidate_number ; i++)
+    for(int i = 0; i < candidate_count; i++)
     {
         if(0 == strcmp(name, candidates[i].name))
         {
             candidates[i].votes++;
             return true;
-        }
-        else
-        {
-            return false;
         }
     }
 
@@ -86,22 +81,8 @@ bool vote(string name)
 // Print the winner (or winners) of the election
 void print_winner(void)
 {
-    int winner_point = get_max_point();
-
-    for(int i = 0, lenght = sizeof(candidates) / sizeof(candidate); i < lenght; i++)
-    {
-        if(winner_point == candidates[i].votes)
-        {
-            printf("%s\n", candidates[i].name);
-        }
-    }
-    return;
-}
-
-int get_max_point(void)
-{
     int max = 0;
-    for(int i = 0, length = sizeof(candidates) / sizeof(candidate); i < length; i++)
+    for(int i = 0; i < candidate_count; i++)
     {
         if(max <= candidates[i]. votes)
         {
@@ -109,5 +90,12 @@ int get_max_point(void)
         }
     }
 
-    return max;
+    for(int i = 0; i < candidate_count; i++)
+    {
+        if(max == candidates[i].votes)
+        {
+            printf("%s\n", candidates[i].name);
+        }
+    }
+    return;
 }
