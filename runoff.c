@@ -170,16 +170,15 @@ int return_valid_vote_from_voter(int voter)
 // Print the winner of the election, if there is one
 bool print_winner(void)
 {
-    float max = 0.0;
-
-    for (int i = 0; i < candidate_count ; i++ )
+    for(int candidate = 0; candidate < candidate_count; candidate++ )
     {
-        if ((float)candidates[i].votes / (float)voter_count > 0.5)
+        if( (float)candidates[candidate].votes / (float)candidate_count > 0.5)
         {
-            printf("%s", candidates[i].name);
+            printf("%s\n", candidates[candidate].name);
             return true;
         }
     }
+
     return false;
 }
 
