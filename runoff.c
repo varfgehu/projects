@@ -173,9 +173,9 @@ bool print_winner(void)
 {
     for (int candidate = 0; candidate < candidate_count; candidate++ )
     {
-        int vote_needed =  ceil( (float)voter_count / 2.0 );
+        //int vote_needed =  ceil( (float)voter_count / 2.0 );
 
-        if( candidates[candidate].votes >= vote_needed )
+        if( candidates[candidate].votes >= (float)voter_count / 2.0 )
         {
             printf("%s\n", candidates[candidate].name);
             return true;
