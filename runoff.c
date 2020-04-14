@@ -33,6 +33,8 @@ int find_min(void);
 bool is_tie(int min);
 void eliminate(int min);
 
+int return_valid_vote_from_voter(int voter);
+
 int main(int argc, string argv[])
 {
     // Check for invalid usage
@@ -140,29 +142,29 @@ bool vote(int voter, int rank, string name)
     return false;
 }
 
-// Tabulate votes for non-eliminated candidates
+// Tabulate votes for non-eliminated candidates UPDATE VOTE COUNTES
 void tabulate(void)
 {
-    for (int voter = 0; voter < voter_count ; voter++)
+    for( int voter = 0; voter < voter_count; voter++)
     {
-        for (int rank = 0; rank < 3; rank++)
+        int vote = return_valid_vote_from_voter(voter);
+
+        candidates[vote].votes++;
+    }
+
+}
+
+int return_valid_vote_from_voter(int voter)
+{
+    for (int candidate = 0; candidate < candidate_count; candidate++)
+    {
+        if(false == candidates[preferences[voter][candidate]].eliminated)
         {
-            if(false == candidates[preferences[voter][rank]].eliminated)
-            {
-                candidates[preferences[voter][rank]].votes++;
-            }
-            else if(false == candidates[preferences[voter][rank + 1]].eliminated)
-            {
-                candidates[preferences[voter][rank+1]].votes++;
-            }
-            else
-            {
-                candidates[preferences[voter][rank+2]].votes++;
-            }
+            return preferences[voter][candidate];
         }
     }
 
-    return;
+    return -1;
 }
 
 // Print the winner of the election, if there is one
