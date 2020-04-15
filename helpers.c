@@ -76,7 +76,6 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
     int tmp_red, tmp_green, tmp_blue;
     int last;
     int left, right;
-    //printf("width: %i\n", width);
 
     for(int row = 0; row < height; row++)
     {
@@ -88,8 +87,6 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
         left = step;
         right = last - step;
 
-        //printf("step: %i\n", step);
-        //printf("left: %i --> right: %i\n", left, right);
         int *tmp = malloc(3 * sizeof(int));
         tmp[0] = image[row][left].rgbtRed;
         tmp[1] = image[row][left].rgbtGreen;
@@ -102,10 +99,6 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
         image[row][right].rgbtRed = tmp[0];
         image[row][right].rgbtGreen = tmp[1];
         image[row][right].rgbtBlue = tmp[2];
-
-        //printf("After reflecting.. \n");
-        //printf("from: %i\n", image[row][from].rgbtRed);
-        //printf("to: %i\n", image[row][to].rgbtRed);
 
         free(tmp);
 
