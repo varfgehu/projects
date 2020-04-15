@@ -74,51 +74,44 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
     int step = 0;
     int tmp_red, tmp_green, tmp_blue;
-    int start_index;
-    int from, to;
-    printf("width: %i\n", width);
+    int last;
+    int left, right;
+    //printf("width: %i\n", width);
+
     for(int row = 0; row < height; row++)
     {
-        //if(0 == width % 2)
+        step = 0;
+        last = width - 1;
+
+        do
         {
-            //even
-            start_index = ((width + 1) / 2) - 1;
-            printf("start_index: %i\n", start_index);
+        left = step;
+        right = last - step;
 
-            do
-            {
-            from = start_index - step;
-            to = start_index + (2 * step) + 1;
-            //printf("from: %i\n", image[row][from].rgbtRed);
-            //printf("to: %i\n", image[row][to].rgbtRed);
-            int *tmp = malloc(3 * sizeof(int));
-            tmp[0] = image[row][from].rgbtRed;
-            tmp[1] = image[row][from].rgbtGreen;
-            tmp[2] = image[row][from].rgbtBlue;
+        //printf("step: %i\n", step);
+        //printf("left: %i --> right: %i\n", left, right);
+        int *tmp = malloc(3 * sizeof(int));
+        tmp[0] = image[row][left].rgbtRed;
+        tmp[1] = image[row][left].rgbtGreen;
+        tmp[2] = image[row][left].rgbtBlue;
 
-            image[row][from].rgbtRed = image[row][to].rgbtRed;
-            image[row][from].rgbtGreen = image[row][to].rgbtGreen;
-            image[row][from].rgbtBlue = image[row][to].rgbtBlue;
+        image[row][left].rgbtRed = image[row][right].rgbtRed;
+        image[row][left].rgbtGreen = image[row][right].rgbtGreen;
+        image[row][left].rgbtBlue = image[row][right].rgbtBlue;
 
-            image[row][to].rgbtRed = tmp[0];
-            image[row][to].rgbtGreen = tmp[1];
-            image[row][to].rgbtBlue = tmp[2];
+        image[row][right].rgbtRed = tmp[0];
+        image[row][right].rgbtGreen = tmp[1];
+        image[row][right].rgbtBlue = tmp[2];
 
-            //printf("After reflecting.. \n");
-            //printf("from: %i\n", image[row][from].rgbtRed);
-            //printf("to: %i\n", image[row][to].rgbtRed);
+        //printf("After reflecting.. \n");
+        //printf("from: %i\n", image[row][from].rgbtRed);
+        //printf("to: %i\n", image[row][to].rgbtRed);
 
-            free(tmp);
+        free(tmp);
 
-            step++;
-            }
-            while(start_index == 0);
+        step++;
         }
-        //else
-        {
-            //odd
-
-        }
+        while(right - left >= 3);
 
     }
 
