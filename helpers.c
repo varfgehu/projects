@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define UPPER_LIMIT 255
 
@@ -71,6 +72,56 @@ void check_for_upper_limit(int *color)
 // Reflect image horizontally
 void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
+    int step = 0;
+    int tmp_red, tmp_green, tmp_blue;
+    int start_index;
+    int from, to;
+    printf("width: %i\n", width);
+    for(int row = 0; row < height; row++)
+    {
+        //if(0 == width % 2)
+        {
+            //even
+            start_index = ((width + 1) / 2) - 1;
+            printf("start_index: %i\n", start_index);
+
+            do
+            {
+            from = start_index - step;
+            to = start_index + (2 * step) + 1;
+            //printf("from: %i\n", image[row][from].rgbtRed);
+            //printf("to: %i\n", image[row][to].rgbtRed);
+            int *tmp = malloc(3 * sizeof(int));
+            tmp[0] = image[row][from].rgbtRed;
+            tmp[1] = image[row][from].rgbtGreen;
+            tmp[2] = image[row][from].rgbtBlue;
+
+            image[row][from].rgbtRed = image[row][to].rgbtRed;
+            image[row][from].rgbtGreen = image[row][to].rgbtGreen;
+            image[row][from].rgbtBlue = image[row][to].rgbtBlue;
+
+            image[row][to].rgbtRed = tmp[0];
+            image[row][to].rgbtGreen = tmp[1];
+            image[row][to].rgbtBlue = tmp[2];
+
+            //printf("After reflecting.. \n");
+            //printf("from: %i\n", image[row][from].rgbtRed);
+            //printf("to: %i\n", image[row][to].rgbtRed);
+
+            free(tmp);
+
+            step++;
+            }
+            while(start_index == 0);
+        }
+        //else
+        {
+            //odd
+
+        }
+
+    }
+
     return;
 }
 
