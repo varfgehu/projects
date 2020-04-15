@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#define UPPER_LIMIT 255
+
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
@@ -44,10 +46,7 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
             sepia_green = round(((float)origi_red * 0.349) + ((float)origi_green * 0.686) + ((float)origi_blue * 0.168));
             sepia_blue = round(((float)origi_red * 0.272) + ((float)origi_green * 0.534) + ((float)origi_blue * 0.131));
 
-            if(sepia_red > 255)
-            {
-                sepia_red = 255;
-            }
+            (sepia > UPPER_LIMIT) ? UPPER_LIMIT : sepia_red;
 
             if(sepia_green > 255)
             {
