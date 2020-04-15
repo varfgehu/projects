@@ -4,6 +4,8 @@
 
 #define UPPER_LIMIT 255
 
+void check_for_upper_limit(int *color);
+
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
@@ -46,17 +48,9 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
             sepia_green = round(((float)origi_red * 0.349) + ((float)origi_green * 0.686) + ((float)origi_blue * 0.168));
             sepia_blue = round(((float)origi_red * 0.272) + ((float)origi_green * 0.534) + ((float)origi_blue * 0.131));
 
-            (sepia > UPPER_LIMIT) ? UPPER_LIMIT : sepia_red;
-
-            if(sepia_green > 255)
-            {
-                sepia_green = 255;
-            }
-
-            if(sepia_blue > 255)
-            {
-                sepia_blue = 255;
-            }
+            check_for_upper_limit(&sepia_red);
+            check_for_upper_limit(&sepia_green);
+            check_for_upper_limit(&sepia_blue);
 
             image[row][column].rgbtRed = sepia_red;
             image[row][column].rgbtGreen = sepia_green;
@@ -64,6 +58,14 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
         }
     }
     return;
+}
+
+void check_for_upper_limit(int *color)
+{
+    if(*color > UPPER_LIMIT)
+    {
+        *color = UPPER_LIMIT;
+    }
 }
 
 // Reflect image horizontally
