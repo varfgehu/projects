@@ -1,11 +1,12 @@
 #include "helpers.h"
 #include <math.h>
+#include <stdio.h>
 
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
     int origi_red, origi_green, origi_blue;
-    int new_grey;
+    int new_gray;
 
     for(int row = 0; row < height; row++ )
     {
@@ -15,11 +16,21 @@ void grayscale(int height, int width, RGBTRIPLE image[height][width])
             origi_green = image[row][column].rgbtGreen;
             origi_blue = image[row][column].rgbtBlue;
 
-            new_grey = round((origi_red + origi_green + origi_blue) / 3);
+            //printf("rgbtRed: %i\n", image[row][column].rgbtRed);
+            //printf("rgbtGreen: %i\n", image[row][column].rgbtGreen);
+            //printf("rgbtBlue: %i\n", image[row][column].rgbtBlue);
 
-            image[row][column].rgbtRed = new_grey;
-            image[row][column].rgbtGreen = new_grey;
-            image[row][column].rgbtBlue = new_grey;
+            new_gray = round(((float)origi_red + (float)origi_green + (float)origi_blue) / 3.0);
+            //printf("new_gray: %i\n", new_gray);
+
+            image[row][column].rgbtRed = new_gray;
+            image[row][column].rgbtGreen = new_gray;
+            image[row][column].rgbtBlue = new_gray;
+
+            //printf("After filtering\n");
+            //printf("rgbtRed: %i\n", image[row][column].rgbtRed);
+            //printf("rgbtGreen: %i\n", image[row][column].rgbtGreen);
+            //printf("rgbtBlue: %i\n", image[row][column].rgbtBlue);
         }
     }
     return;
