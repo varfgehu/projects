@@ -7,7 +7,8 @@
 #define UPPER_LIMIT 255
 
 void check_for_upper_limit(int *color);
-void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width], RGBTRIPLE copied_image[heigth][width]);
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width],
+                     RGBTRIPLE copied_image[heigth][width]);
 
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
@@ -86,27 +87,27 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 
         do
         {
-        left = step;
-        right = last - step;
+            left = step;
+            right = last - step;
 
-        int *tmp = malloc(3 * sizeof(int));
-        tmp[0] = image[row][left].rgbtRed;
-        tmp[1] = image[row][left].rgbtGreen;
-        tmp[2] = image[row][left].rgbtBlue;
+            int *tmp = malloc(3 * sizeof(int));
+            tmp[0] = image[row][left].rgbtRed;
+            tmp[1] = image[row][left].rgbtGreen;
+            tmp[2] = image[row][left].rgbtBlue;
 
-        image[row][left].rgbtRed = image[row][right].rgbtRed;
-        image[row][left].rgbtGreen = image[row][right].rgbtGreen;
-        image[row][left].rgbtBlue = image[row][right].rgbtBlue;
+            image[row][left].rgbtRed = image[row][right].rgbtRed;
+            image[row][left].rgbtGreen = image[row][right].rgbtGreen;
+            image[row][left].rgbtBlue = image[row][right].rgbtBlue;
 
-        image[row][right].rgbtRed = tmp[0];
-        image[row][right].rgbtGreen = tmp[1];
-        image[row][right].rgbtBlue = tmp[2];
+            image[row][right].rgbtRed = tmp[0];
+            image[row][right].rgbtGreen = tmp[1];
+            image[row][right].rgbtBlue = tmp[2];
 
-        free(tmp);
+            free(tmp);
 
-        step++;
+            step++;
         }
-        while(right - left >= 3);
+        while (right - left >= 3);
 
     }
 
@@ -131,7 +132,8 @@ void blur(int heigth, int width, RGBTRIPLE image[heigth][width])
     return;
 }
 
-void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width], RGBTRIPLE copied_image[heigth][width] )
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width],
+                     RGBTRIPLE copied_image[heigth][width])
 {
     int sum_red = 0, sum_green = 0, sum_blue = 0;
     int index = 0;
