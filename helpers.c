@@ -2,11 +2,12 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define UPPER_LIMIT 255
 
 void check_for_upper_limit(int *color);
-void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width]);
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width], RGBTRIPLE copied_image[heigth][width]);
 
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
@@ -113,24 +114,28 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 }
 
 // Blur image
-void blur(int height, int width, RGBTRIPLE image[height][width])
+void blur(int heigth, int width, RGBTRIPLE image[heigth][width])
 {
-    for(int row = 0; row < /*1*/height; row++ )
+    int i = 0;
+    RGBTRIPLE copied_image[heigth][width];
+
+    memcpy(&copied_image, image, sizeof(copied_image));
+
+    //printf("[0][0] image: [%i][%i][%i] copy: [%i][%i][%i]", image[0][0].rgbtRed,image[0][0].rgbtGreen, image[0][0].rgbtBlue, copied_image[0][0].rgbtRed, copied_image[0][0].rgbtGreen, copied_image[0][0].rgbtBlue);
+
+    for(int row = 0; row </*1*/heigth; row++ )
     {
         for(int column = 0; column < /*1*/width; column++)
         {
-            set_pixel_blury(row, column, height, width, image);
+            set_pixel_blury(row, column, heigth, width, image, copied_image);
         }
     }
-
-    //set_pixel_blury(1, 1, height, width, image);
 
     return;
 }
 
-void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width])
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width], RGBTRIPLE copied_image[heigth][width] )
 {
-    int average_red[9], average_green[9], average_blue[9];
     int sum_red = 0, sum_green = 0, sum_blue = 0;
     int index = 0;
     //printf("pixel[%i][%i]\n", row, column);
@@ -144,20 +149,22 @@ void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image
 
             if((row + i >= 0 && column + j >= 0) && (row + i < heigth && column + j < width))
             {
-                //printf("Valid pixel\n");
-                sum_red += image[row + i][column + j].rgbtRed;
-                sum_green += image[row + i][column + j].rgbtGreen;
-                sum_blue += image[row + i][column + j].rgbtBlue;
+                //printf("Valid pixel --> R:%i, G:%i, B:%i\n", copied_image[row + i][column + j].rgbtRed, copied_image[row + i][column + j].rgbtGreen, copied_image[row + i][column + j].rgbtBlue);
+
+                sum_red += copied_image[row + i][column + j].rgbtRed;
+                sum_green += copied_image[row + i][column + j].rgbtGreen;
+                sum_blue += copied_image[row + i][column + j].rgbtBlue;
 
                 index++;
             }
             else
             {
-               //printf("Invalid pixel\n");
+               //printf("Invalid pixel --> [%i][%i]\n", row, column);
             }
         }
     }
 
+    //printf("index: %i\n", index);
     /*if(index == 0)
     {
         printf("index = 0, row: %i, column: %i", row, column);
@@ -169,8 +176,6 @@ void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image
 
     //printf("average red: %i\n", image[row][column].rgbtRed);
     //printf("average green: %i\n", image[row][column].rgbtGreen);
-    //printf("average blue: %i\n", image[row][column].rgbtBlue);
+    //printf("average blue: %i\n\n\n", image[row][column].rgbtBlue);
 
 }
-
-
