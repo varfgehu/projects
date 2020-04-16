@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     //open file
     FILE *file = fopen(argv[1], "r");
-    if(file == NULL)
+    if (file == NULL)
     {
         printf("%s file cannot be opened for reading\n", argv[1]);
         return 1;
@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
     {
         bytes_read = fread(buffer, 1, 512, file);
         //printf("Inteded: %i, Actually read: %i\n", 512, bytes_read);
-        if(1 == is_jpeg_header_detected(buffer))
+        if (1 == is_jpeg_header_detected(buffer))
         {
-            printf("JPEG file header found\n");
+            //printf("JPEG file header found\n");
 
             //first JPEG found
-            if(0 == first_jpeg_found)
+            if (0 == first_jpeg_found)
             {
                 first_jpeg_found = 1;
                 //1.compose filename
@@ -74,19 +74,19 @@ int main(int argc, char *argv[])
         else
         {
             // no header detected
-            if(img != NULL)
+            if (img != NULL)
             {
                 fwrite(buffer, 1, bytes_read, img);
             }
         }
     }
-    while(bytes_read == 512);
+    while (bytes_read == 512);
 
 }
 
 int is_jpeg_header_detected(BYTE buffer[512])
 {
-    if(buffer[0] == 0xff && buffer[1] == 0xd8 && buffer[2] == 0xff && (buffer[3] & 0xf0) == 0xe0)
+    if (buffer[0] == 0xff && buffer[1] == 0xd8 && buffer[2] == 0xff && (buffer[3] & 0xf0) == 0xe0)
     {
         return 1;
     }
