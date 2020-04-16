@@ -6,6 +6,7 @@
 #define UPPER_LIMIT 255
 
 void check_for_upper_limit(int *color);
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width]);
 
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
@@ -114,5 +115,71 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
+    for(int row = 0; row < /*1*/height; row++ )
+    {
+        for(int column = 0; column < /*1*/width; column++)
+        {
+            set_pixel_blury(row, column, height, width, image);
+        }
+    }
+
     return;
 }
+
+void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image[heigth][width])
+{
+    int average_red[9], average_green[9], average_blue[9];
+    int index = 0;
+    //printf("pixel[%i][%i]\n", row, column);
+    //printf("Neighbors:\n");
+
+    for(int i = -1; i <= 1; i++)
+    {
+        for (int j = - 1; j <= 1; j++)
+        {
+            //printf("[%i][%i] -->", row + i, column + j);
+
+            if((row + i >= 0 && column + j >= 0) && (row + i < heigth && column + j < width))
+            {
+                //printf("Valid pixel\n");
+                average_red[index] = image[row + i][column + j].rgbtRed;
+                average_green[index] = image[row + i][column + j].rgbtGreen;
+                average_blue[index] = image[row + i][column + j].rgbtBlue;
+
+                index++;
+            }
+            else
+            {
+               //printf("Invalid pixel\n");
+            }
+        }
+    }
+
+        int sum_red = 0, sum_green = 0, sum_blue = 0;
+        int red, green, blue;
+
+    for(int i =0; i < index; i++)
+    {
+        sum_red += average_red[i];
+        sum_green += average_green[i];
+        sum_blue += average_blue[i];
+    }
+
+    /*if(index == 0)
+    {
+        printf("index = 0, row: %i, column: %i", row, column);
+    }*/
+
+    image[row][column].rgbtRed = round((float)sum_red / (float)index);
+    image[row][column].rgbtGreen = round((float)sum_green / (float)index);
+    image[row][column].rgbtBlue = round((float)sum_blue / (float)index);
+
+
+/*
+    printf("average red: %i\n", image[row][column].rgbtRed);
+    printf("average green: %i\n", image[row][column].rgbtGreen);
+    printf("average blue: %i\n", image[row][column].rgbtBlue);
+*/
+}
+
+
