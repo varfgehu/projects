@@ -116,12 +116,9 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 // Blur image
 void blur(int heigth, int width, RGBTRIPLE image[heigth][width])
 {
-    int i = 0;
     RGBTRIPLE copied_image[heigth][width];
 
     memcpy(&copied_image, image, sizeof(copied_image));
-
-    //printf("[0][0] image: [%i][%i][%i] copy: [%i][%i][%i]", image[0][0].rgbtRed,image[0][0].rgbtGreen, image[0][0].rgbtBlue, copied_image[0][0].rgbtRed, copied_image[0][0].rgbtGreen, copied_image[0][0].rgbtBlue);
 
     for(int row = 0; row </*1*/heigth; row++ )
     {
@@ -138,44 +135,23 @@ void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image
 {
     int sum_red = 0, sum_green = 0, sum_blue = 0;
     int index = 0;
-    //printf("pixel[%i][%i]\n", row, column);
-    //printf("Neighbors:\n");
 
     for(int i = -1; i <= 1; i++)
     {
         for (int j = - 1; j <= 1; j++)
         {
-            //printf("[%i][%i] -->", row + i, column + j);
-
             if((row + i >= 0 && column + j >= 0) && (row + i < heigth && column + j < width))
             {
-                //printf("Valid pixel --> R:%i, G:%i, B:%i\n", copied_image[row + i][column + j].rgbtRed, copied_image[row + i][column + j].rgbtGreen, copied_image[row + i][column + j].rgbtBlue);
-
                 sum_red += copied_image[row + i][column + j].rgbtRed;
                 sum_green += copied_image[row + i][column + j].rgbtGreen;
                 sum_blue += copied_image[row + i][column + j].rgbtBlue;
 
                 index++;
             }
-            else
-            {
-               //printf("Invalid pixel --> [%i][%i]\n", row, column);
-            }
         }
     }
-
-    //printf("index: %i\n", index);
-    /*if(index == 0)
-    {
-        printf("index = 0, row: %i, column: %i", row, column);
-    }*/
 
     image[row][column].rgbtRed = round((float)sum_red / (float)index);
     image[row][column].rgbtGreen = round((float)sum_green / (float)index);
     image[row][column].rgbtBlue = round((float)sum_blue / (float)index);
-
-    //printf("average red: %i\n", image[row][column].rgbtRed);
-    //printf("average green: %i\n", image[row][column].rgbtGreen);
-    //printf("average blue: %i\n\n\n", image[row][column].rgbtBlue);
-
 }
