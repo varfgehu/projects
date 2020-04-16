@@ -15,9 +15,9 @@ void grayscale(int height, int width, RGBTRIPLE image[height][width])
     int origi_red, origi_green, origi_blue;
     int new_gray;
 
-    for(int row = 0; row < height; row++ )
+    for (int row = 0; row < height; row++)
     {
-        for(int column = 0; column < width; column++)
+        for (int column = 0; column < width; column++)
         {
             origi_red = image[row][column].rgbtRed;
             origi_green = image[row][column].rgbtGreen;
@@ -39,9 +39,9 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
     int origi_red, origi_green, origi_blue;
     int sepia_red, sepia_green, sepia_blue;
 
-    for(int row = 0; row < height; row++ )
+    for (int row = 0; row < height; row++)
     {
-        for(int column = 0; column < width; column++)
+        for (int column = 0; column < width; column++)
         {
             origi_red = image[row][column].rgbtRed;
             origi_green = image[row][column].rgbtGreen;
@@ -65,7 +65,7 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
 
 void check_for_upper_limit(int *color)
 {
-    if(*color > UPPER_LIMIT)
+    if (*color > UPPER_LIMIT)
     {
         *color = UPPER_LIMIT;
     }
@@ -79,7 +79,7 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
     int last;
     int left, right;
 
-    for(int row = 0; row < height; row++)
+    for (int row = 0; row < height; row++)
     {
         step = 0;
         last = width - 1;
@@ -120,9 +120,9 @@ void blur(int heigth, int width, RGBTRIPLE image[heigth][width])
 
     memcpy(&copied_image, image, sizeof(copied_image));
 
-    for(int row = 0; row </*1*/heigth; row++ )
+    for (int row = 0; row </*1*/heigth; row++)
     {
-        for(int column = 0; column < /*1*/width; column++)
+        for (int column = 0; column < /*1*/width; column++)
         {
             set_pixel_blury(row, column, heigth, width, image, copied_image);
         }
@@ -136,11 +136,11 @@ void set_pixel_blury(int row, int column, int heigth, int width, RGBTRIPLE image
     int sum_red = 0, sum_green = 0, sum_blue = 0;
     int index = 0;
 
-    for(int i = -1; i <= 1; i++)
+    for (int i = -1; i <= 1; i++)
     {
         for (int j = - 1; j <= 1; j++)
         {
-            if((row + i >= 0 && column + j >= 0) && (row + i < heigth && column + j < width))
+            if ((row + i >= 0 && column + j >= 0) && (row + i < heigth && column + j < width))
             {
                 sum_red += copied_image[row + i][column + j].rgbtRed;
                 sum_green += copied_image[row + i][column + j].rgbtGreen;
