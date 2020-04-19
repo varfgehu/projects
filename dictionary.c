@@ -230,8 +230,8 @@ bool unload(void)
     {
         if(table[i] != NULL)
         {
-            cursor = table[0];
-            tmp = table[0];
+            cursor = table[i];
+            tmp = table[i];
 
             do
             {
