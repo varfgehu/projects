@@ -18,7 +18,7 @@ typedef struct node
 node;
 
 // Number of buckets in hash table
-const unsigned int N = 26*26*26;
+const unsigned int N = 26 * 26 * 26;
 
 // Hash table
 node *table[N];
@@ -30,13 +30,12 @@ bool check(const char *word)
 
     for (node *tmp = table[hash_index]; tmp != NULL; tmp = tmp->next)
     {
-        if(0 == strcasecmp (tmp->word, word))
+        if (0 == strcasecmp(tmp->word, word))
         {
             return true;
         }
     }
 
-    // TODO
     return false;
 }
 
@@ -49,19 +48,15 @@ unsigned int hash(const char *word)
     int tens = 0;
     int ones = 0;
 
-    //make sure that the first 2 characters are a --> z lowercase!
-    //strncpy(lowercase_word, word, 2);
-
-
     length = strlen(word);
 
-    if(1 == length)
+    if (1 == length)
     {
-        if(word[0] >= 'A' && word[0] <= 'Z')
+        if (word[0] >= 'A' && word[0] <= 'Z')
         {
             lowercase_word[0] = word[0] + 32;
         }
-        else if(word[0] >= 'a' && word[0] <= 'z')
+        else if (word[0] >= 'a' && word[0] <= 'z')
         {
             lowercase_word[0] = word[0];
         }
@@ -78,11 +73,11 @@ unsigned int hash(const char *word)
     else// if(2 == length)
     {
 
-        if(word[0] >= 'A' && word[0] <= 'Z')
+        if (word[0] >= 'A' && word[0] <= 'Z')
         {
             lowercase_word[0] = word[0] + 32;
         }
-        else if(word[0] >= 'a' && word[0] <= 'z')
+        else if (word[0] >= 'a' && word[0] <= 'z')
         {
             lowercase_word[0] = word[0];
         }
@@ -91,11 +86,11 @@ unsigned int hash(const char *word)
             lowercase_word[0] = '\0';
         }
 
-        if(word[1] >= 'A' && word[1] <= 'Z')
+        if (word[1] >= 'A' && word[1] <= 'Z')
         {
             lowercase_word[1] = word[1] + 32;
         }
-        else if(word[1] >= 'a' && word[1] <= 'z')
+        else if (word[1] >= 'a' && word[1] <= 'z')
         {
             lowercase_word[1] = word[1];
         }
@@ -109,22 +104,15 @@ unsigned int hash(const char *word)
 
         return (tens + ones);
     }
-    /*else
-    {
-        hunderds = (word[0] - 97) * 26 * 26;
-        tens = (word[1] - 97) * 26;
-        ones = (word[2] - 97) * 1;
 
-        return (hunderds + tens + ones);
-    }*/
 }
 
 // Loads dictionary into memory, returning true if successful else false
 bool load(const char *dictionary)
 {
     int i = 0;
-    int hash_index= 0;
-    char word[LENGTH+1];
+    int hash_index = 0;
+    char word[LENGTH + 1];
 
     FILE *file = fopen(dictionary, "r");
     if (file == NULL)
@@ -132,9 +120,8 @@ bool load(const char *dictionary)
         return false;
     }
 
-    while(EOF != fscanf(file, "%s", word))
+    while (EOF != fscanf(file, "%s", word))
     {
-//        printf("%s\n", word);
         node *new_node = malloc(sizeof(node));
         if (new_node == NULL)
         {
@@ -146,9 +133,7 @@ bool load(const char *dictionary)
 
         hash_index = hash(word);
 
-//        printf("Before new node - table[%i] address: %p\n", 0, table[0]);
-
-        if(table[hash_index] == NULL)
+        if (table[hash_index] == NULL)
         {
             //first node in the [hash_index] array, simply create a node
 //            printf("First node for table[%i], creating..\n\n", hash_index);
@@ -161,27 +146,9 @@ bool load(const char *dictionary)
             new_node->next = table[hash_index];
             table[hash_index] = new_node;
         }
-
-//        printf("After new node - table[%i] address: %p\n", 0, table[0]);
-
-
-
     }
-/*
-    while(i< 26 * 26 * 26)
-    {
-        if(table[i] != NULL)
-        {
-            for (node *tmp = table[i]; tmp != NULL; tmp = tmp->next)
-            {
-                printf("%s\n", tmp->word);
-            }
-        }
-        i++;
-    }
-*/
+
     fclose(file);
-    // TODO
     return true;
 }
 
@@ -191,9 +158,9 @@ unsigned int size(void)
     int i = 0;
     unsigned int sum = 0;
 
-    while(i< 26 * 26 * 26)
+    while (i < 26 * 26 * 26)
     {
-        if(table[i] != NULL)
+        if (table[i] != NULL)
         {
             for (node *tmp = table[i]; tmp != NULL; tmp = tmp->next)
             {
@@ -203,7 +170,6 @@ unsigned int size(void)
         i++;
     }
 
-    // TODO
     return sum;
 }
 
@@ -213,48 +179,27 @@ bool unload(void)
     node *cursor = NULL;
     node *tmp = NULL;
 
-/*
-    printf("Before freeing table[0]\n");
-    if(table[0] != NULL)
-    {
-        for (node *show = table[0]; show != NULL; show = show->next)
-        {
-            printf("%s\n", show->word);
-        }
-    }
-*/
     cursor = table[0];
     tmp = table[0];
 
-    for(int i = 0; i < 26*26*26; i++)
+    for (int i = 0; i < 26 * 26 * 26; i++)
     {
-        if(table[i] != NULL)
+        if (table[i] != NULL)
         {
             cursor = table[i];
             tmp = table[i];
 
             do
             {
-            cursor = cursor->next;
-            free(tmp);
+                cursor = cursor->next;
+                free(tmp);
 
-            tmp = cursor;
+                tmp = cursor;
 
             }
-            while(tmp != NULL);
+            while (tmp != NULL);
         }
     }
 
-/*
-    printf("After freeing table[0]\n");
-    if(table[0] != NULL)
-    {
-        for (node *show = table[0]; show != NULL; show = show->next)
-        {
-            printf("%s\n", show->word);
-        }
-    }
-*/
-    // TODO
     return true;
 }
