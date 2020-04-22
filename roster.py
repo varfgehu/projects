@@ -13,7 +13,7 @@ house = argv[1]
 students = db.execute("SELECT first, middle, last, birth FROM students WHERE house = ? ORDER BY last, first", house)
 
 for student in students:
-    if student['middle'] == "None":
+    if student['middle'] is None:
         print(student['first'] + " " + student['last'] + ", born in " + str(student['birth']))
     else:
         print(student['first'] + " " + student['middle'] + " " + student['last'] + ", born in " + str(student['birth']))
