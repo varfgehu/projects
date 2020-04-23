@@ -1,0 +1,40 @@
+h1
+{
+    text-align: center;
+}
+
+td
+{
+    border: 1px;
+    text-align: center;
+    padding: 5px;
+}
+
+table
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#front-pic
+{
+    padding: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 70%;
+    width: 400px;
+}
+
+body
+{
+    padding: 5px;
+    background-color: lightgrey;
+}
+
+#prototype
+{
+    text-align: center;
+    color: red;
+    font-style: oblique;
+}
