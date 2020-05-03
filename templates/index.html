@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    index
+{% endblock %}
+
+{% block main %}
+    <h1 class="login_h1">Welcome!</h1>
+    <p style="text-align:left; margin-left: 10%;">Here is the concept of the website.<br>
+    The basic problem is that you can not travel as soon as you have a great travel idea. You need a way to collect them.<br>
+    This website heps you to collect your ideas with a fun addition!<br>
+    You can upload your travel ideas in the Upload menu.<br>
+    When uploading, you have to give it a name, a brief description (you can add POIs or information about transportation)<br>
+    and you have to enter the time you need for your trip.<br>
+    When you have some free time for traveling but you do not know where to go you can simply visit the website.<br>
+    Under Get Random menu you have to enter the length of your free time<br>
+    and the site will show your next trip randomly selected from your previously uploaded ideas.</p>
+
+    {% if trip_name %}
+        <p> Your next trip: {{ trip_name }} </p>
+        <p> Length: {{ trip_length }} </p>
+        <p> Description: {{ trip_description }} </p>
+    {% endif %}
+
+    {% if results %}
+        <br>
+        <h4 style="margin-top: 20px;margin-left: 10%; display: block;">Quick overview of your own poll summary:</h4>
+        <br>
+        <table style="width:400px; border: 1px solid black;margin-left: auto; margin-right: auto; margin-botton: 10%; vertical-align: middle; display: block;">
+            <tr>
+                <th style="width:200px;">Length of the trip</th>
+                <th style="width:200px;">Number of trips uploaded</th>
+            </tr>
+        {% for result in results %}
+            <tr>
+                <td>{{result["trip_length"]}} day trips</td>
+                <td>{{result["COUNT(trip_length)"]}}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <h4 style="margin-left: 10%;">Inspiration</h4>
+        <img style="margin-top: 25px; margin-left: auto; margin-right: auto; margin-bottom: 10px; display: block;"src="https://mk0theadventuregfnyq.kinstacdn.com/wp-content/uploads/Hiking-Best-Hiking-Boots-for-Wide-Feet-1200x520.jpg" width="65%" border="5px">
+        <img style="margin-top: 25px; margin-left: auto; margin-right: auto; margin-bottom: 10px; display: block;"src="https://icdn5.digitaltrends.com/image/digitaltrends/backpacking-white-mountains-new-hampshire-exos-eja-1200x800.jpg" width="65%" border="5px">
+        <img style="margin-top: 25px; margin-left: auto; margin-right: auto; margin-bottom: 10px; display: block;"src="https://expertvagabond.com/wp-content/uploads/backpacking-gear-checklist-guide-900x600.jpg" width="65%" border="5px">
+        <img style="margin-top: 25px; margin-left: auto; margin-right: auto; margin-bottom: 10px; display: block;"src="https://icdn2.digitaltrends.com/image/digitaltrends/osprey-atmos-ag-65-lifestyle.jpg" width="65%" border="5px">
+    {% endif %}
+
+{% endblock %}
