@@ -1,0 +1,75 @@
+h1[id="welcome"]{
+  text-align: center;
+  color:black;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 900px) {
+  h1[id="welcome"]::after {
+    content: "Welcome to my webpage, thank you for visiting!";
+    }
+}
+@media (max-width: 899px) {
+  h1[id="welcome"]::after {
+    content: "Welcome to my webpage!";
+    }
+}
+
+h2{
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.top-margin-25{
+  margin-top:25px;
+}
+
+.top-margin-45{
+  margin-top:45px;
+}
+
+.imgbox {
+    display: grid;
+    width:auto;
+    margin: 0;
+    paddig: 0;
+}
+.center-fit {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit:cover;
+}
+
+.rigth-fit {
+    max-width: 100%;
+    margin-left: : 50px;
+    padding: 0;
+    object-fit:cover;
+    float:rigth;
+    text-align:right;
+}
+
+.hobby-container{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+  .hobby-container > div {
+    background-color: white;
+    font-size: 16px;
+    margin: 20px;
+    padding: 20px;
+    width: 300px;
+    border: 3px solid black;
+    }
+
+.small-pic-center{
+  width: 200px;
+}
+
+a:link {color: black;}      /* unvisited link */
+a:visited {color: black;}   /* visited link */
+a:hover {color: black;}     /* mouse over link */
+a:active {color: black;}    /* selected link */
