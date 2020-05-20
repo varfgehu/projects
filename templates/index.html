@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+  Index
+{% endblock %}
+
+{% block main %}
+<div class="container mx-auto">
+  <div class="row">
+      <div class="col mx-5 px-5">
+        <div class="mb-4">
+          <h1>Search for books</h1>
+          <p>You can search for books in the database of this webpage.</p>
+          <p>Please use only one search parameter at a time from the given possibilities.<br>
+            If you type in only part of a title, ISBN, or author name,<br>
+              the search page should find matches for those as well!</p>
+        </div>
+        <form action="{{url_for('books')}}" method="post">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text span-width-150" id="basic-addon1" width=150px >ISBN</span>
+              <input class="form-control" type="text" name="isbn" placeholder="ISBN number" aria-label="isbn" aria-describedby="basic-addon1">
+            </div>
+          </div>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text span-width-150" id="basic-addon2">Author</span>
+              <input class="form-control" type="text" name="author" placeholder="Author of the book" aria-label="Author" aria-describedby="basic-addon2">
+            </div>
+          </div>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text span-width-150" id="basic-addon3">Title</span>
+              <input class="form-control" type="text" name="title" placeholder="Title of the book" aria-label="Title" aria-describedby="basic-addon3">
+            </div>
+          </div>
+          <div class="input-group mb-2">
+            <button class="btn btn-dark">Search book</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
