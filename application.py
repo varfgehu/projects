@@ -163,15 +163,6 @@ def api(isbn):
 
     return jsonify(result_dict)
 
-    #return jsonify({\
-    #        "title": ,
-    #        "author": ,
-    #        "year": ,
-    #        "isbn": isbn,
-    #        "review_count": ,
-    #        "average_score:":
-    #})
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """
@@ -267,21 +258,3 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def login_required():
-    if session.get("user_id") is None:
-        return redirect("/login")
