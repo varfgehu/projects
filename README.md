@@ -46,4 +46,8 @@ Large size book cover, author, title, year if publication, ISBN number.
 Rating and review number for Goodread website. Link to the webpage of the book on Goodread's website.
 The user has the opportunity the leave a review and a reting for each book, but only one for each book.
 If the logged in user has already left a review, the user review field will notify the user, other case the user can leave a review through a drop-down list and a textarea.
-If other user reviews are exist, the user can found in in the last section of the page. 
+If other user reviews are exist, the user can found in in the last section of the page.
+
+/api/<isbn>
+
+If users make a GET request to your website’s /api/<isbn> route, where <isbn> is an ISBN number, your website should return a JSON response containing the book’s title, author, publication date, ISBN number, review count, and average score.
