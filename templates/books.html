@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+  Books
+{% endblock %}
+
+{% block main %}
+  <h1 class="center">Search results</h1>
+
+  <div class="container">
+    <div class="row">
+      {% for book in books %}
+        <div class="col book">
+          <img class="center" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" width=75px />
+          <p class="mb-1">{{book.author}}</p>
+          <p class="mb-1">{{book.title}}</p>
+          <a class="mb-3" href="{{ url_for('book', book_id=book.id) }}">See details</a>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endblock %}
