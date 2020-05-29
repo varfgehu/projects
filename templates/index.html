@@ -6,14 +6,20 @@
 
 {% block main %}
   <h1>Select a channel from the list or create a new one</h1>
-  <form action="index.html" method="post">
+  <form action="/create" method="post">
     <div class="form-group">
-      <input type="text" class="form-control" name="channel" id="channel" autofocus>
+      <input type="text" class="form-control" name="new_channel" id="new_channel" autofocus>
     </div>
     <button class="btn btn-primary" type="submit" >Create channel</button>
   </form>
-  <h1>Choose from an existing channel</h1>
-  <ul>
-    
-  </ul>
+  {% if channels %}
+    <h1>Choose from an existing channel</h1>
+    <ul>
+      {% for channel_item in channels %}
+        <li><a href="{{ url_for('channel', channel_name=channel_item) }}">{{ channel_item }}</a></li>
+      {% endfor%}
+    </ul>
+  {% else %}
+  <p>No channels yet.</p>
+  {% endif %}
 {% endblock%}

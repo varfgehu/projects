@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<script src="../static/channel.js"></script>
+{% endblock %}
+
+{% block title %}
+{{ session.channel_entered}}
+{% endblock %}
+
+{% block main %}
+
+<h1>Channel: <span>{{ session.channel_entered }}</span></h1>
+
+<div>
+  <textarea id="chat_area" name="chat" rows="30" cols="40">
+    {% if messages %}
+      {% for message in messages %}
+        <{{ message }}>
+      {% endfor %}
+    {% else %}
+      No messages yet.
+    {% endif %}
+  </textarea>
+</div>
+<div>
+  <input id="new_message"size="140" autocomplete="off" autofocus type="text">
+</div>
+<div>
+  <button id="send_button" class="btn btn-success" type="reset">Send</button>
+</div>
+<div>
+  <button id="leave_channel" class="btn btn-warning">Leave channel</button>
+</div>
+
+
+
+
+
+
+{% endblock %}

@@ -29,9 +29,13 @@ existingChannels = []
 # Store logged in users
 usersLoggedIn = []
 
+# Store messages for each channel
+channel_messages = dict()
+
 @app.route("/")
 @login_required
 def index():
+    print(existingChannels)
     return render_template("index.html", channels=existingChannels)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -55,7 +59,7 @@ def login():
         print("Username: " + username)
 
         # Remember the user session on a cookie if the browser is closed
-        session.permanent = True
+        #session.permanent = True
 
         return redirect("/")
 
@@ -75,6 +79,42 @@ def logout():
     # Forget any user_id
     session.clear()
 
-
     # Redirect user to login form
     return redirect("/")
+
+
+@app.route("/create", methods=["GET", "POST"])
+@login_required
+def create():
+    """
+    Create new channel, add to local list and redirect user to index
+    """
+
+    if request.method == "POST":
+        new_channel = request.form.get("new_channel")
+
+        if new_channel in existingChannels:
+            return render_template("apology.html", message="Channel already exists!")
+
+        existingChannels.append(new_channel)
+        print(existingChannels)
+
+        channel_messages[new_channel] = []
+
+        return redirect("/channel/" + new_channel)
+    else:
+        return render_template("apology.html", message="create GET request branch")
+
+
+@app.route("/channel/<channel_name>", methods=["GET", "POST"])
+@login_required
+def channel(channel_name):
+    """
+    Open channel page, to read and send messages
+    """
+    session['channel_entered'] = channel_name
+
+    if request.method == "POST":
+        print("channel/" + channel_name + " POST")
+    else:
+        return render_template("channel.html", messages = channel_messages[channel_name])
