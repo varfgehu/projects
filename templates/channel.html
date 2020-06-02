@@ -13,24 +13,15 @@
 <h1>Channel: <span>{{ session.channel_entered }}</span></h1>
 
 <div>
-  <textarea id="chat_area" name="chat" rows="30" cols="40">
-    {% if messages %}
-      {% for message in messages %}
-        <{{ message }}>
-      {% endfor %}
-    {% else %}
-      No messages yet.
-    {% endif %}
+  <textarea id="chat_area" name="chat" rows="15" cols="20" style="width:600px;" readonly>{% for message in messages %}{{ message }}{% endfor %}
   </textarea>
 </div>
-<div>
-  <input id="new_message"size="140" autocomplete="off" autofocus type="text">
+<div class="form-group">
+  <input id="new_message"size="140" autocomplete="off" autofocus type="text" class="form-group" style="width:600px">
 </div>
-<div>
-  <button id="send_button" class="btn btn-success" type="reset">Send</button>
-</div>
-<div>
-  <button id="leave_channel" class="btn btn-warning">Leave channel</button>
+<div style="width:600px">
+  <button id="send_button" class="btn btn-dark" type="reset">Send</button>
+  <button id="leave_channel" class="btn btn-dark" style="margin-left: 400px;">Leave channel</button>
 </div>
 
 

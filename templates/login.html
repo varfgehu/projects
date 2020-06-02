@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<script src="../static/login.js"></script>
+{% endblock %}
+
 {% block title %}
   Flack
 {% endblock %}
@@ -9,10 +13,10 @@
   <h2>Choose a username to continue!</h2>
   <form action="/login" method="post">
     <div class="form-group">
-      <input type="text" class="form-control" id="username" name="username" autofocus aria-describedby="userHelp">
+      <input type="text" class="form-control" id="username" name="username" autofocus aria-describedby="userHelp" style="width:200px">
       <small id="userHelp" class="form-text text-muted">This username will identify you during chatting.</small>
     </div>
-    <button class="btn btn-primary" type="submit">Log In</button>
+    <button class="btn btn-dark" type="submit">Log In</button>
   </form>
 
 {% endblock%}

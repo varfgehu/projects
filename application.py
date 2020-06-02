@@ -2,7 +2,9 @@ import os
 
 from flask import Flask, session, jsonify, render_template, request, redirect
 from flask_session import Session
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room
+
+from collections import deque
 
 from helpers import login_required
 
@@ -32,10 +34,20 @@ usersLoggedIn = []
 # Store messages for each channel
 channel_messages = dict()
 
+# Forget any users
+usersLoggedIn.clear()
+
+
+
 @app.route("/")
 @login_required
 def index():
+    print("Logged in users:")
+    print(usersLoggedIn)
+
+    print("Existing Channels:")
     print(existingChannels)
+
     return render_template("index.html", channels=existingChannels)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -74,7 +86,10 @@ def logout():
     """
 
     # Remove username from the taken list
-    usersLoggedIn.remove(session['username'])
+    try:
+        usersLoggedIn.remove(session['username'])
+    except ValueError:
+        pass
 
     # Forget any user_id
     session.clear()
@@ -99,7 +114,7 @@ def create():
         existingChannels.append(new_channel)
         print(existingChannels)
 
-        channel_messages[new_channel] = []
+        channel_messages[new_channel] = deque(maxlen=100)
 
         return redirect("/channel/" + new_channel)
     else:
@@ -114,7 +129,65 @@ def channel(channel_name):
     """
     session['channel_entered'] = channel_name
 
+    print(channel_messages[channel_name])
+
     if request.method == "POST":
         print("channel/" + channel_name + " POST")
     else:
         return render_template("channel.html", messages = channel_messages[channel_name])
+
+@socketio.on("joined")
+def joined():
+    """
+    Notify other users of joining a channel(room)
+    """
+
+    channel = session["channel_entered"]
+
+    join_room(channel)
+
+    join_message = '[-- ' + session['username'] + ' has joined the channel --]\n'
+
+    emit('status_update', {
+        'user': session['username'],
+        'message': join_message,
+        'channel': channel},
+        room = channel)
+
+    channel_messages[session['channel_entered']].append(join_message)
+
+@socketio.on("left")
+def leave():
+    """
+    Notify other users of joining a channel(room)
+    """
+    channel = session["channel_entered"]
+
+    leave_room(channel)
+
+    left_message = '[-- ' + session['username'] + ' has left the channel --]\n'
+
+    emit('status_update', {
+        'user': session['username'],
+        'message': left_message},
+        room = channel)
+
+    channel_messages[session['channel_entered']].append(left_message)
+
+@socketio.on("submit message")
+def message(data):
+    print('"submit message" detected')
+    print(data)
+
+    if len(channel_messages[session['channel_entered']]) > 100:
+        print("max number of messages reached")
+
+
+    print(channel_messages[session['channel_entered']])
+
+    processed_message = session['username'] + ": " + data["new_message"] + "\n"
+    channel_messages[session['channel_entered']].append(processed_message)
+
+    emit('announced message', {
+        'new_message': processed_message
+        }, room = session['channel_entered'] )

@@ -1,19 +1,23 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<script src="../static/index.js"></script>
+{% endblock %}
+
 {% block title %}
   Flack
 {% endblock %}
 
 {% block main %}
-  <h1>Select a channel from the list or create a new one</h1>
+  <h1>Create a new channel or select one from the list</h1>
   <form action="/create" method="post">
     <div class="form-group">
-      <input type="text" class="form-control" name="new_channel" id="new_channel" autofocus>
+      <input type="text" class="form-control" name="new_channel" id="new_channel" autofocus style="width:400px">
     </div>
-    <button class="btn btn-primary" type="submit" >Create channel</button>
+    <button class="btn btn-dark" type="submit" >Create channel</button>
   </form>
+  <h1>Existing channels</h1>
   {% if channels %}
-    <h1>Choose from an existing channel</h1>
     <ul>
       {% for channel_item in channels %}
         <li><a href="{{ url_for('channel', channel_name=channel_item) }}">{{ channel_item }}</a></li>
