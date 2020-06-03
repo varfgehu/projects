@@ -181,7 +181,8 @@ def message(data):
 
     if len(channel_messages[session['channel_entered']]) > 100:
         print("max number of messages reached")
-
+        leave_room(session["channel_entered"])
+        return render_template("apology.html", message="Sorry, you have exceeded the 100 messages/channel limit. You can create a new channel.")
 
     print(channel_messages[session['channel_entered']])
 
