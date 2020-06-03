@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <!-- BOOTSTRAP CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Socket IO JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
+
+    {% block head %}
+    {% endblock %}
+
+<title>
+  Project 2: {% block title %}{% endblock %}
+</title>
+  </head>
+  <body>
+      <nav class="navbar navbar-expand navbar-dark bg-dark border">
+          <a class="navbar-brand" style="color:white">
+              Project 2: Flack
+          </a>
+          <div class="navbar-collapse collapse" id="navbarNavDropdown">
+              {% if session.username %}
+                  <ul class="navbar-nav mr-auto">
+                      <li id="channels" class="nav-item"><a class="nav-link" href="/">Channels</a></li>
+                  </ul>
+                  <ul class="navbar-nav ml-auto">
+                      <li class="nav-item"><a class="nav-link" href="#">{{ session.username }}</a></li>
+                      <li id="logout" class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                  </ul>
+              {% else %}
+                  <ul class="navbar-nav ml-auto">
+                      <li id="login" class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                  </ul>
+              {% endif %}
+          </div>
+      </nav>
+
+    <main>
+      {% block main %} {% endblock %}
+    </main>
+  </body>
+</html>
