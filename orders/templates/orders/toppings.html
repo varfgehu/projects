@@ -19,6 +19,8 @@
       <tr>
         <td scope="row">
           {{ topping.name }}
+        </td>
+        <td>
           <form action="add_topping" method="POST">
             {% csrf_token %}
             <input type="hidden" name="topping" value="{{topping.name}}">

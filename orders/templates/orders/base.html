@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{% block title %}Tim's Site{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -74,8 +74,14 @@
         <p class="sidenav-user">Click <a class="sidenav-user" href="/login">here</a> to login</p>
       {% endif %}
 
-      <!-- <a class="sidenav-links" href="/home">Home</a>
-      <a class="sidenav-links" href="/create">Create</a>
+      <a class="sidenav-links" href="/">Menu</a>
+      {% if user.is_authenticated %}
+      <a class="sidenav-links" href="/orders">Your Orders</a>
+      {% endif %}
+      {%if user.is_staff %}
+      <a class="sidenav-links" href="/staff">Manage Orders</a>
+      {% endif %}
+      <!-- <a class="sidenav-links" href="/create">Create</a>
       <a class="sidenav-links" href="/view">View</a>
       <a class="sidenav-links" href="/menu">Menu</a> -->
       <div class="sidenav-cart ml-2 mt-5">
@@ -88,7 +94,7 @@
           <p class="cart-title">Total: ${{total}}</p>
           <form action="{% url 'cart_buttons' %}" method="post">
             {% csrf_token %}
-            <input class="btn btn-success" type="submit" name="cart_button" value="Checkout">
+            <input class="btn btn-success" type="submit" name="cart_button" value="Place Order">
             <input class="btn btn-warning" type="submit" name="cart_button" value="Clear All">
           </form>
         {% else %}
@@ -102,7 +108,7 @@
     <div id="content", name="content" class="main">
       <div class="row justify-content-center">
         <div class="col-8">
-          <h1 class="mt-2">My Site</h1>
+          <h1 class="mt-2">Pizza Express - best pizza in the town!</h1>
           <hr class="mt-0 mb-4">
           {% block content %}
           {% endblock %}

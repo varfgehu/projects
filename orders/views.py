@@ -7,6 +7,10 @@ from django.db import models
 from .models import Regular_pizza, Sicilian_pizza, Toppings
 from .models import OrderCounter
 from .models import Order
+from .models import Sub
+from .models import Pasta
+from .models import Salad
+from .models import Dinner_platter
 
 from django.db.models import Max, Sum
 
@@ -37,6 +41,10 @@ def index(response):
     context = {
         "regular_pizzas": Regular_pizza.objects.all(),
         "sicilian_pizzas": Sicilian_pizza.objects.all(),
+        "subs": Sub.objects.all(),
+        "pastas": Pasta.objects.all(),
+        "salads": Salad.objects.all(),
+        "dinner_platters": Dinner_platter.objects.all(),
         "toppings": Toppings.objects.all(),
         "user": response.user,
         "items": Order.objects.filter(counter_id = counter_id_for_user.counter),
@@ -46,14 +54,14 @@ def index(response):
 
 def add_to_cart(response):
     category = response.POST["category"]
-    pizza_name = response.POST["pizza_name"]
-    pizza_size = response.POST["pizza_size"]
+    item_name = response.POST["item_name"]
+    item_size = response.POST["item_size"]
     price = response.POST["price"]
 
     print("<------- ADD BUTTON PUSHED ------->\ndetails:")
     print(category)
-    print(pizza_name)
-    print(pizza_size)
+    print(item_name)
+    print(item_size)
     print(price)
 
     username = response.user
@@ -68,20 +76,20 @@ def add_to_cart(response):
     counter_id_for_the_user = OrderCounter.objects.get(user=response.user).counter
     print(counter_id_for_the_user)
 
-    asseble_item = category.title() + " pizza, " + pizza_name + ", Size: " + pizza_size
+    asseble_item = category.title() + " " + item_name + ", Size: " + item_size
 
     new_item = Order(user=username, counter_id=counter_id_for_the_user, item = asseble_item, price=price)
     new_item.save()
     print("Item added")
     print(new_item)
 
-    if pizza_name == "1 topping":
+    if item_name == "1 topping":
         number_of_toppings_to_chooes = 1
-    elif pizza_name == "2 toppings":
+    elif item_name == "2 toppings":
         number_of_toppings_to_chooes = 2
-    elif pizza_name == "3 toppings":
+    elif item_name == "3 toppings":
         number_of_toppings_to_chooes = 3
-    elif pizza_name == "Special":
+    elif item_name == "Special":
         number_of_toppings_to_chooes = 4
     else:
         print("unknown pizza name!!")
@@ -135,11 +143,11 @@ def add_topping(response):
 def cart_buttons(response):
     button_pressed = response.POST["cart_button"]
 
-    if button_pressed == "Checkout":
+    if button_pressed == "Place Order":
         counter_id_for_the_user = OrderCounter.objects.get(user=response.user).counter
-        orders = Order.objects.filter(user=response.user, status="order taken")
+        orders = Order.objects.filter(user=response.user, status="order noted")
         for order in orders:
-            order.status ="checked out"
+            order.status ="payment done"
             order.save()
         order_counter = OrderCounter.objects.get(user=response.user)
         order_counter_max = OrderCounter.objects.aggregate(Max('counter'))
@@ -151,6 +159,44 @@ def cart_buttons(response):
         counter_id_for_the_user = OrderCounter.objects.get(user=response.user).counter
         Order.objects.filter(counter_id = counter_id_for_the_user).delete()
         return HttpResponseRedirect("/")
+
+def orders(response):
+    orders = Order.objects.filter(user=response.user).order_by("-datetime")
+    counter_id_for_the_user = OrderCounter.objects.get(user=response.user).counter
+    total_dict = Order.objects.filter(counter_id = counter_id_for_the_user).aggregate(Sum('price'))
+
+    context = {
+        "orders": orders,
+        "items": Order.objects.filter(counter_id = counter_id_for_the_user).order_by("-datetime"),
+        "total": total_dict["price__sum"]
+    }
+
+    return render(response, "orders/orders.html", context)
+
+def set_to_done(response):
+    order_id = response.POST["order_id"]
+    item = Order.objects.get(id=order_id)
+    item.status = "Served"
+    item.save()
+    return HttpResponseRedirect("/staff")
+
+def staff(response):
+    username = response.user
+    user = User.objects.get(username=username)
+    if user.is_staff == False:
+        return HttpResponseRedirect("/")
+
+    counter_id_for_the_user = OrderCounter.objects.get(user=response.user).counter
+    total_dict = Order.objects.filter(counter_id = counter_id_for_the_user).aggregate(Sum('price'))
+
+    context = {
+        "orders": Order.objects.all().order_by("-datetime"),
+        "items": Order.objects.filter(counter_id = counter_id_for_the_user),
+        "total": total_dict["price__sum"]
+
+    }
+    return render(response, "orders/staff.html", context)
+
 
 def login_view(response):
     if response.method == "POST":
@@ -166,7 +212,7 @@ def login_view(response):
                 order_counter = OrderCounter(counter = 1, user = username, status="init")
                 order_counter.save()
 
-            if order_counter.status == "order taken":
+            if order_counter.status == "order noted":
                 order_counter_max = OrderCounter.objects.aggregate(Max('counter'))
                 order_counter.counter = order_counter_max["counter__max"] + 1
                 order_counter.save()
