@@ -1,0 +1,268 @@
+{% extends "orders/base.html" %}
+
+{% block title %}Menu{% endblock %}
+
+{% block content %}
+
+<h1>Read our menu</h1>
+
+{% if regular_pizzas %}
+<h4 id="regular" name="regular">Regular Pizza</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Pizza</th>
+      <th scope="col">Small</th>
+      <th scope="col">Large</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for regular_pizza in regular_pizzas %}
+      <tr>
+        <td scope="row">{{ regular_pizza.name }}</td>
+
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ regular_pizza.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="regular">
+              <input type="hidden" name="item_name" value="{{regular_pizza.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{regular_pizza.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+        <td>
+          <form action="add_to_cart" method="POST">
+            {% csrf_token %}
+            ${{ regular_pizza.price_large|floatformat:2 }}
+            {% if user.is_authenticated %}
+            <input type="hidden" name="category" value="regular">
+            <input type="hidden" name="item_name" value="{{regular_pizza.name}}">
+            <input type="hidden" name="item_size" value="large">
+            <input type="hidden" name="price" value="{{regular_pizza.price_large}}">
+
+            <input type="submit" name="submit" value="+">
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if sicilian_pizzas %}
+<h4 id="regular" name="regular">Sicilain Pizza</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Pizza</th>
+      <th scope="col">Small</th>
+      <th scope="col">Large</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sicilian_pizza in sicilian_pizzas %}
+      <tr>
+        <td scope="row">{{ sicilian_pizza.name }}</td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ sicilian_pizza.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="sicilian">
+              <input type="hidden" name="item_name" value="{{sicilian_pizza.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{sicilian_pizza.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ sicilian_pizza.price_large|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="sicilian">
+              <input type="hidden" name="item_name" value="{{sicilian_pizza.name}}">
+              <input type="hidden" name="item_size" value="large">
+              <input type="hidden" name="price" value="{{sicilian_pizza.price_large}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if subs %}
+<h4 id="sub" name="sub">Sub</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Sub</th>
+      <th scope="col">Small</th>
+      <th scope="col">Large</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sub in subs %}
+      <tr>
+        <td scope="row">{{ sub.name }}</td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ sub.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="sub">
+              <input type="hidden" name="item_name" value="{{sub.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{sub.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ sub.price_large|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="sub">
+              <input type="hidden" name="item_name" value="{{sub.name}}">
+              <input type="hidden" name="item_size" value="large">
+              <input type="hidden" name="price" value="{{sub.price_large}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if pastas %}
+<h4 id="pasta" name="pasta">Pasta</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Pasta</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pasta in pastas %}
+      <tr>
+        <td scope="row">{{ pasta.name }}</td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ pasta.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="pasta">
+              <input type="hidden" name="item_name" value="{{pasta.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{pasta.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if salads %}
+<h4 id="salad" name="salad">Salad</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Salad</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for salad in salads %}
+      <tr>
+        <td scope="row">{{ salad.name }}</td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ salad.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="salad">
+              <input type="hidden" name="item_name" value="{{salad.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{salad.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if dinner_platters %}
+<h4 id="dinner_platter" name="dinner_platter">Dinner Platter</h4>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Dinner Platter</th>
+      <th scope="col">Small</th>
+      <th scope="col">Large</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dinner_platter in dinner_platters %}
+      <tr>
+        <td scope="row">{{ dinner_platter.name }}</td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ dinner_platter.price_small|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="dinner_platter">
+              <input type="hidden" name="item_name" value="{{dinner_platter.name}}">
+              <input type="hidden" name="item_size" value="small">
+              <input type="hidden" name="price" value="{{dinner_platter.price_small}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+          <td>
+            <form action="add_to_cart" method="POST">
+              {% csrf_token %}
+              ${{ dinner_platter.price_large|floatformat:2 }}
+              {% if user.is_authenticated %}
+              <input type="hidden" name="category" value="dinner_platter">
+              <input type="hidden" name="item_name" value="{{dinner_platter.name}}">
+              <input type="hidden" name="item_size" value="large">
+              <input type="hidden" name="price" value="{{dinner_platter.price_large}}">
+
+              <input type="submit" name="submit" value="+">
+              {% endif %}
+            </form>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
