@@ -1,0 +1,17 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<h1>Display personal info</h1>
+
+<br><br>
+<p>Hi,{{personal_info.first_name}}! Please check your data.</p>
+<p>Age: {{ personal_info.age }}</p>
+<p>Sex: {{ personal_info.sex }}</p>
+<p>Height: {{ personal_info.present_height }} cm</p>
+<p>Weight: {{ personal_info.present_weight }} kg</p>
+
+{% endblock %}

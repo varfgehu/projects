@@ -1,0 +1,108 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Add meal{% endblock %}
+
+{% block content %}
+<h1>Prepare meal</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+{% load static %}
+<!-- <script src="{% static "nutrition/search_meal.js" %}" type="text/javascript"></script> -->
+
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js">
+</script>
+
+<!-- <script type="text/javascript">
+  window.onload = function() {
+    var chart = new CanvasJS.Chart("ChartContainer", {
+      title:{
+        text: "My First Chart in CanvasJS"
+      },
+      data: [
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "column",
+        dataPoints: [
+          { label: "Carb", y: 10 },
+          { label: "Protein", y: 15 },
+          { label: "Fat", y: 25 },
+          { label: "Fiber", y: 30 },
+          { label: "Calorie", y: 28 }
+        ]
+      }
+      ]
+    });
+    chart.render();
+  }
+
+
+</script> -->
+
+<form action="{% url 'add_meal_defined' date meal_type %}" method="post">
+{% csrf_token %}
+<div class="form-group row">
+  <label for="date-input" class="col-2 col-form-label">Date</label>
+  <div class="col-10">
+    <input class="form-control" type="date" name="date" value="{{date}}">
+  </div>
+</div>
+<div class="form-group">
+  <div class="form-group">
+    <label for="">Set the precise meal</label>
+    <input class="form-control" type="text" name="meal_type" value="{{meal_type}}" list="meal_type_list">
+  </div>
+  <datalist id="meal_type_list">
+    <option>breakfast</option>
+    <option>lunch</option>
+    <option>snack1</option>
+    <option>dinner</option>
+    <option>snack2</option>
+  </datalist>
+</div>
+<label for="">Add your ingredients</label>
+<div name="ingredients" class="form-group" class="ingredients">
+  <div class="form-group col-8">
+    <input class="input-form" type="number" id="quantity" name="quantity" value="" min="0" max="300"><span>gram  </span>
+    <input class="input-control" type="text" id="ingredient" name="ingredient" list="ingredients-list" value="">
+  </div>
+  <datalist id="ingredients-list">
+    {% for food in foods %}
+      <option>{{food.name}}</option>
+    {% endfor %}
+  </datalist>
+</div>
+<div class="">
+  <input class="" type="submit" name="add_meal_defined_button" value="Add">
+</div>
+<div class="">
+  <table>
+    <tr>
+      <th>Quantity</th>
+      <th>Food</th>
+    </tr>
+    {% for intake in intakes %}
+      {% for portion in intake.portions.all %}
+      <tr>
+        <td><input type="number" name="quantity" value="{{portion.quantity}}" min="0" max="500"><span>g</span></td>
+        <td>{{portion.foods}}</td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+  </table>
+</div>
+
+
+<input type="submit" name="add_meal_button" value="Change date/meal">
+<input class="" type="submit" name="add_meal_button" value="Save">
+</form>
+<div id="ChartContainer" style="height: 300px; width: 100%;">
+
+</div>
+
+
+{% endblock %}

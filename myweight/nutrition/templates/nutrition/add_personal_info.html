@@ -1,0 +1,27 @@
+
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Personal Info{% endblock %}
+
+{% block content %}
+<h1>Add Personal Info</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+<form action="{% url 'add_personal_info' %}" method="post">
+{% csrf_token %}
+<label for="">Height</label><input type="text" name="present_height">
+<label for="">Weight</label><input type="text" name="present_weight">
+<label for="">Sex</label><select class="" name="sex">
+    <option value="Female">Female</option>
+    <option value="Male">Male</option>
+</select>
+<br>
+<label for="">Age</label><input type="text" name="age">
+<input type="submit" value="Submit">
+</form>
+
+{% endblock %}
