@@ -5,12 +5,12 @@ import datetime
 # Create your models here.
 class Food(models.Model):
     name = models.CharField(max_length=64, default="")
-    carb = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    sugar = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    protein = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    fat = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    fiber = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    calorie = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    carb = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+    sugar = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+    protein = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+    fat = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+    fiber = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+    calorie = models.DecimalField(max_digits=7, decimal_places=4, default=0)
 
     def __str__(self):
         return f"{self.name}"
@@ -110,18 +110,23 @@ class Personal(models.Model):
     )
     username = models.CharField(max_length=64)
     first_name = models.CharField(max_length=64)
-    present_weight = models.DecimalField(max_digits=4, decimal_places=1)
     present_height = models.DecimalField(max_digits=4, decimal_places=1)
     sex = models.CharField(max_length=8, choices = SEX_CHOICES, default = '2')
     age = models.IntegerField()
+    activity_level = models.DecimalField(max_digits=5, decimal_places = 1, default = 1)
+    planned_daily_offset = models.IntegerField(default = 0)
 
     def __str__(self):
-        return f"{self.username} weight: {self.present_weight} sex: {self.sex}"
+        return f"{self.username}"
 
 class Measurement(models.Model):
-    username = models.CharField(max_length=64)
-    weight = models.DecimalField(max_digits=4, decimal_places=1)
-    height = models.DecimalField(max_digits=4, decimal_places=1)
+    username = models.CharField(max_length = 64)
+    date = models.DateField( help_text = "date of consume", default = datetime.date.today)
+    weight = models.DecimalField(max_digits = 4, decimal_places = 1, default=99)
+    bmi = models.DecimalField(max_digits = 7, decimal_places = 1, default = 99)
+    body_fat = models.DecimalField(max_digits = 4, decimal_places = 1, default = 99)
+    body_water = models.DecimalField(max_digits = 4, decimal_places = 1, default = 99)
+
 
     def __str__(self):
-        return f"{self.username} weight: {self.weight} height: {self.height}"
+        return f"{self.username} {self.date} weight: {self.weight} kg"

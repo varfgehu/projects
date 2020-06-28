@@ -9,10 +9,13 @@ from .models import Ingredient, Meal
 from datetime import date
 from .models import MealItem
 from .models import Food, Portion, Intake
+from .models import Measurement
+from decimal import Decimal
 
 # Create your views here.
 def home(response):
-    #display personal information
+    user = response.user
+
     if not response.user.is_authenticated:
         return render(response, "nutrition/login.html", {"message": None})
 
@@ -21,27 +24,59 @@ def home(response):
     except Personal.DoesNotExist:
         return render(response, "nutrition/add_personal_info.html", {})
 
+    if response.method == "POST":
+        weight = response.POST["weight"]
+        bmi = response.POST["bmi"]
+        bodyfat = response.POST["bodyFat"]
+        bodywater = response.POST["bodyWater"]
+        now = date.today().strftime("%Y-%m-%d")
+
+
+        measurements = Measurement.objects.filter(username = user, date = now)
+        if not measurements:
+            measurements = Measurement(username = user, date = now)
+            measurements.save()
+        Measurement.objects.filter(username = user, date = now).update(weight = weight, bmi = bmi, body_fat = bodyfat, body_water = bodywater)
+
+    latest_weight = float(Measurement.objects.filter(username = user).last().weight)
+    height = float(Personal.objects.get(username=user).present_height)
+    age = float(Personal.objects.get(username=user).age)
+    activity_level = float(Personal.objects.get(username=user).activity_level)
+    calorie_offset = float(Personal.objects.get(username=user).planned_daily_offset)
+    bmr = 66.5 + (13.75 * latest_weight) + (5.003 * height) - (6.755 * age)
+    tex = round((bmr * activity_level) + 0.1, 0)
+    daily_calorie = tex + calorie_offset
     context = {
-        "personal_info":presonal_info
+        "personal_info":presonal_info,
+        "latest": Measurement.objects.filter(username = user).last(),
+        "bmr" : bmr,
+        "tex": tex,
+        "daily_calorie": daily_calorie
     }
 
     return render(response, "nutrition/home.html", context)
 
-def add_personal_info(response):
+def set_personal_info(response):
+    user = response.user
     if response.method == "POST":
-        present_weight = response.POST["present_weight"]
         present_height = response.POST["present_height"]
         sex = response.POST["sex"]
         age = response.POST["age"]
-        first_name = User.objects.get(username=response.user)
+        first_name = User.objects.get(username = user)
+        activity_level = response.POST["activity_level"]
+        planned_daily_offset = response.POST["planned_daily_offset"]
 
-        personal_info = Personal(username=response.user, first_name=first_name, present_weight=present_weight, present_height=present_height, sex=sex, age=age)
-        personal_info.save()
+        personal = Personal.objects.filter(username = user)
+        if not personal:
+            personal = Personal(username = user, first_name = first_name, present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset)
+            personal.save()
+        Personal.objects.filter(username = user).update(present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset)
 
-        return HttpResponseRedirect(reverse("home"))
+    context = {
+        "personal": Personal.objects.get(username=response.user)
+    }
 
-    else:
-        return render(response, "nutrition/add_personal_info.html")
+    return render(response, "nutrition/set_personal_info.html", context)
 
 def search_meal(response):
     if response.method == "GET":
@@ -53,6 +88,12 @@ def search_meal(response):
         return render(response, "nutrition/search_meal.html", context)
     else:
         return render(response, "nutrition/search_meal-html")
+
+def prepare_meal(response):
+    today = date.today()
+    now = today.strftime("%Y-%m-%d")
+    meal_type = "breafast"
+    return add_meal_defined(response, now, meal_type)
 
 def add_meal_defined(response, date, meal_type):
     username = response.user
@@ -67,13 +108,42 @@ def add_meal_defined(response, date, meal_type):
             food = Food.objects.get(name=ingredient)
             portion = Portion.objects.filter(foods=food, quantity=quantity).first()
             if not portion:
-                add_portion = Portion(foods=food, quantity=quantity)
-                add_portion.save()
+                portion = Portion(foods=food, quantity=quantity)
+                portion.save()
             intake = Intake.objects.filter(user = username, date = date, meal_type = meal_type).first()
+            if not intake:
+                intake = Intake(user = username, date = date, meal_type = meal_type)
+                intake.save()
             intake.portions.add(portion)
+        elif button_pressed == "Change date/meal":
+            date = response.POST["date"]
+            meal_type = response.POST["meal_type"]
+        elif button_pressed == "Save":
+            # update manytomany field in Intake
+            intake = Intake.objects.filter(user = username, date = date, meal_type = meal_type).first()
+            intake.portions.clear()
 
-    #         return redirect("add_meal_defined")
+            food_in_table = response.POST.getlist('food_in_table')
+            quantity_in_table = response.POST.getlist('quantity_in_table')
+            length = len(quantity_in_table)
+            print(food_in_table)
+            print(quantity_in_table)
+            print(length)
 
+            for i in range(length):
+                print(food_in_table[i])
+                print(quantity_in_table[i])
+
+                food = Food.objects.get(name=food_in_table[i])
+                portion = Portion.objects.filter(foods=food, quantity=quantity_in_table[i]).first()
+                if not portion:
+                    portion = Portion(foods=food, quantity=quantity_in_table[i])
+                    portion.save()
+                intake = Intake.objects.filter(user = username, date = date, meal_type = meal_type).first()
+                if not intake:
+                    intake = Intake(user = username, date = date, meal_type = meal_type)
+                    intake.save()
+                intake.portions.add(portion)
 
     context = {
         "date": date,

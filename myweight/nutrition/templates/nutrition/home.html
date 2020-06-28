@@ -5,13 +5,70 @@ Home
 {% endblock %}
 
 {% block content %}
-<h1>Display personal info</h1>
+<h4>Display personal info</h4>
 
 <br><br>
 <p>Hi,{{personal_info.first_name}}! Please check your data.</p>
 <p>Age: {{ personal_info.age }}</p>
 <p>Sex: {{ personal_info.sex }}</p>
 <p>Height: {{ personal_info.present_height }} cm</p>
-<p>Weight: {{ personal_info.present_weight }} kg</p>
+
+<h4>Latest measurements</h4>
+<div class="">
+  <label for="">Weight:</label>
+  <span>{{latest.weight}} kg</span>
+</div>
+<div class="">
+  <label for="">BMI:</label>
+  <span>{{latest.bmi}}</span>
+</div>
+<div class="">
+  <label for="">Body Fat:</label>
+  <span>{{latest.body_fat}} % </span>
+</div>
+<div class="">
+  <label for="">Body Water:</label>
+  <span>{{latest.body_water}} %</span>
+</div>
+
+<h4>Calculations</h4>
+<div class="">
+  <label for="">BMR:</label>
+  <span>{{bmr}}</span>
+</div>
+<div class="">
+  <label for="">Total Energy Expaditure:</label>
+  <span>{{tex}}</span>
+</div>
+<div class="">
+  <label for="">Daily Calorie:</label>
+  <span>{{daily_calorie}}</span>
+</div>
+
+
+<h4>Add today's measurements</h4>
+<form class="" action="{% url 'home' %}" method="post">
+  {% csrf_token %}
+  <div class="">
+    <label for="">Weight[kg]:</label>
+    <input type="number" name="weight" step="0.1">
+  </div>
+  <div class="">
+    <label for="">BMI[1]:</label>
+    <input type="number" name="bmi" step="0.1">
+  </div>
+  <div class="">
+    <label for="">Body Fat[%]:</label>
+    <input type="number" name="bodyFat" step="0.1">
+  </div>
+  <div class="">
+    <label for="">Body Water[%]:</label>
+    <input type="number" name="bodyWater" step="0.1">
+  </div>
+  <input type="submit" name="home_button" value="Submit">
+  <div class="">
+    <small>If you already have submitted your measurements, you can update them by resubmitting.</small>
+  </div>
+</form>
 
 {% endblock %}

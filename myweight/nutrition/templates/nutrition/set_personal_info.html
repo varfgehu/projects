@@ -1,0 +1,47 @@
+
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Personal Info{% endblock %}
+
+{% block content %}
+<h1>Add Personal Info</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+<div class="form-group">
+  <form action="{% url 'set_personal_info' %}" method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="">Height [cm]</label>
+    <input type="text" name="present_height" value="{{personal.present_height}}">
+  </div>
+  <div class="form-group">
+    <label for="">Sex</label>
+    <input type="text" name="sex" value="{{personal.sex}}" list="sex_list">
+    <datalist id="sex_list">
+      <option >male</option>
+      <option >female</option>
+    </datalist>
+  </div>
+  <div class="form-group">
+    <label for="">Age</label>
+    <input type="text" name="age" value="{{personal.age}}">
+  </div>
+  <div class="form-group">
+    <label for="">Activity level</label>
+    <input type="number" name="activity_level" step="0.01" value="{{personal.activity_level}}">
+  </div>
+  <div class="form-group">
+    <label for="">Calorie offset [kcal]</label>
+    <input type="number" name="planned_daily_offset" value="{{personal.planned_daily_offset}}">
+    <div class="">
+      <small>Deficit or surplus. For deficit set a negative value</small>
+    </div>
+  </div>
+  <input type="submit" value="Set/update">
+  </form>
+</div>
+
+{% endblock %}
