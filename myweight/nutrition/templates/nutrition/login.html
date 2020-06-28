@@ -1,0 +1,22 @@
+
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+<form action="{% url 'login' %}" method="post">
+{% csrf_token %}
+<input type="text" name="username">
+<input type="password" name="password">
+<input type="submit" value="Login">
+</form>
+<p>Or click <a href="/register">here</a> to register.</p>
+
+{% endblock %}

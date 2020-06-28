@@ -1,0 +1,24 @@
+function recalculate() {
+  var table = document.getElementById('sum_table');
+  for (var row = 1, number_of_rows = table.rows.length - 2; row < number_of_rows; row++) {
+      var quantity = table.rows[row].cells[0].querySelector('input').value
+
+      for (var column = 0, number_of_columns = table.rows[row].cells.length; column < number_of_columns; column++) {
+          console.log(table.rows[row].cells[column].querySelector('input').value);
+      }
+  }
+
+
+
+
+  for (var column = 2, number_of_columns = table.rows[0].cells.length; column < number_of_columns; column++ ) {
+    for ( var row = 1, number_of_rows = table.rows.length - 3, sum = 0; row <= number_of_rows; row ++ ) {
+        console.log(row);
+        console.log(column);
+        console.log(table.rows[row].cells[column].querySelector('span').innerText);
+        sum += Number(table.rows[row].cells[column].querySelector('span').innerText);
+        console.log("-------------")
+    }
+    table.rows[number_of_rows].cells[column].querySelector('span').innerText = sum;
+
+  }

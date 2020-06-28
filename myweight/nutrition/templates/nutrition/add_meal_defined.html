@@ -1,0 +1,175 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Add meal{% endblock %}
+
+{% block content %}
+<h1>Prepare meal</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+{% load static %}
+<!-- <script src="{% static "nutrition/search_meal.js" %}" type="text/javascript"></script> -->
+<style media="screen">
+  #sum_table:hover {
+    display:block;
+  }
+</style>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js">
+</script>
+
+<!-- <script type="text/javascript">
+  window.onload = function() {
+    var chart = new CanvasJS.Chart("ChartContainer", {
+      title:{
+        text: "My First Chart in CanvasJS"
+      },
+      data: [
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "column",
+        dataPoints: [
+          { label: "Carb", y: 10 },
+          { label: "Protein", y: 15 },
+          { label: "Fat", y: 25 },
+          { label: "Fiber", y: 30 },
+          { label: "Calorie", y: 28 }
+        ]
+      }
+      ]
+    });
+    chart.render();
+  }
+
+
+</script> -->
+
+<form action="{% url 'add_meal_defined' date meal_type %}" method="post">
+{% csrf_token %}
+<div class="form-group row">
+  <label for="date-input" class="col-2 col-form-label">Date</label>
+  <div class="col-10">
+    <input class="form-control" type="date" name="date" value="{{date}}">
+  </div>
+</div>
+<div class="form-group">
+  <div class="form-group">
+    <label for="">Set the precise meal</label>
+    <input class="form-control" type="text" id="meal_type" name="meal_type" value="{{meal_type}}" list="meal_type_list">
+  </div>
+  <datalist id="meal_type_list">
+    <option>breakfast</option>
+    <option>lunch</option>
+    <option>snack1</option>
+    <option>dinner</option>
+    <option>snack2</option>
+  </datalist>
+</div>
+<div>
+  <input type="submit" name="add_meal_defined_button" value="Change date/meal">
+</div>
+<label for="">Add your ingredients</label>
+<div name="ingredients" class="form-group" class="ingredients">
+  <div class="form-group col-8">
+    <input class="input-form" type="number" id="quantity" name="quantity" value="" min="0" max="300"><span>gram  </span>
+    <input class="input-control" type="text" id="ingredient" name="ingredient" list="ingredients-list" value="">
+  </div>
+  <datalist id="ingredients-list">
+    {% for food in foods %}
+      <option>{{food.name}}</option>
+    {% endfor %}
+  </datalist>
+</div>
+<div class="">
+  <input class="" type="submit" name="add_meal_defined_button" value="Add">
+</div>
+<div class="">
+  <table id="sum_table">
+    <tr>
+      <th>Quantity</th>
+      <th>Food</th>
+      <th>Carb</th>
+      <th>Fiber</th>
+      <th>Sugar</th>
+      <th>Protein</th>
+      <th>Fat</th>
+      <th>Calorie</th>
+    </tr>
+    {% for intake in intakes %}
+      {% for portion in intake.portions.all %}
+      <tr>
+        <td><input type="number" name="quantity_in_table" value="{{portion.quantity}}" min="0" max="500" onchange=recalculate()><span>g</span></td>
+        <td><input type="hidden" name="food_in_table" value="{{portion.foods}}">{{portion.foods}}</td>
+        <td><input type="hidden" name="{{portion.foods}}_carb" value="{{portion.foods.carb}}"><span>{% widthratio portion.foods.carb 1 portion.quantity %}</span></td>
+        <td><input type="hidden" name="{{portion.foods}}_fiber" value="{{portion.foods.fiber}}"><span>{% widthratio portion.foods.fiber 1 portion.quantity %}</span></td>
+        <td><input type="hidden" name="{{portion.foods}}_sugar" value="{{portion.foods.sugar}}"><span>{% widthratio portion.foods.sugar 1 portion.quantity %}</span></td>
+        <td><input type="hidden" name="{{portion.foods}}_protein" value="{{portion.foods.protein}}"><span>{% widthratio portion.foods.protein 1 portion.quantity %}</span></td>
+        <td><input type="hidden" name="{{portion.foods}}_fat" value="{{portion.foods.fat}}"><span>{% widthratio portion.foods.fat 1 portion.quantity %}</span></td>
+        <td><input type="hidden" name="{{portion.foods}}_calorie" value="{{portion.foods.calorie}}"><span>{% widthratio portion.foods.calorie 1 portion.quantity %}</span></td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+    <tr style="border-bottom:1px solid black">
+      <td colspan="100%"></td>
+    </tr>
+    <tr>
+      <td>Total</td>
+      <td></td>
+      <td><span>total carb</span></td>
+      <td><span>total fiber</span></td>
+      <td><span>total sugar</span></td>
+      <td><span>total protein</span></td>
+      <td><span>total fat</span></td>
+      <td><span>total calorie</span></td>
+    </tr>
+    <tr>
+      <td>Needed</td>
+      <td></td>
+      <td><span>carb needed</span></td>
+      <td><span>fiber needed</span></td>
+      <td><span></span></td>
+      <td><span>protein needed</span></td>
+      <td><span>fat needed</span></td>
+      <td><span>calorie needed</span></td>
+    </tr>
+  </table>
+</div>
+
+
+
+<input class="" type="submit" name="add_meal_defined_button" value="Save">
+</form>
+<div id="ChartContainer" style="height: 300px; width: 100%;">
+
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("meal_type").onclick = function() {
+      document.getElementById("meal_type").value = "";
+    };
+    recalculate();
+  });
+
+  function recalculate() {
+    var table = document.getElementById('sum_table');
+    for (var row = 1, number_of_rows = table.rows.length - 3; row < number_of_rows; row++) {
+        var quantity = table.rows[row].cells[0].querySelector('input').value
+        for (var column = 2, number_of_columns = table.rows[row].cells.length; column < number_of_columns; column++) {
+            table.rows[row].cells[column].querySelector('span').innerText = Number(table.rows[row].cells[column].querySelector('input').value * quantity).toFixed(2);
+        }
+    }
+
+    for (var column = 2, number_of_columns = table.rows[0].cells.length; column < number_of_columns; column++ ) {
+      for ( var row = 1, number_of_rows = table.rows.length - 4, sum = 0; row <= number_of_rows; row ++ ) {
+          sum += Number(table.rows[row].cells[column].querySelector('span').innerText);
+      }
+      table.rows[table.rows.length-2].cells[column].querySelector('span').innerText = Number(sum).toFixed(2);
+    }
+  }
+</script>
+
+{% endblock %}
