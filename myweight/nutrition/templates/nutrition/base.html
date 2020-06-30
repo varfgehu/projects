@@ -50,25 +50,21 @@
       }
     </style>
 
-
-
   </head>
   <body>
     <div class="sidenav">
       {% if user.is_authenticated %}
         <p class="sidenav-user">Welcome, {{user.username}}!</p>
         <p class="sidenav-user"><a class="sidenav-user" href="/log_out">Logout</a></p>
+
+        <a class="sidenav-links" href="/">Home</a>
+        <a class="sidenav-links" href="/set_personal_info">Set personal info</a>
+        <a class="sidenav-links" href="/prepare_meal">Prepare Meal</a>
+        <a class="sidenav-links" href="/maintain_food_data">Maintain Food Data</a>
       {% else %}
         <p class="sidenav-user">You are not logged in.</p>
         <p class="sidenav-user">Click <a class="sidenav-user" href="/login">here</a> to login</p>
       {% endif %}
-
-      <a class="sidenav-links" href="/">Home</a>
-      <a class="sidenav-links" href="/set_personal_info">Set personal info</a>
-      <a class="sidenav-links" href="/prepare_meal">Prepare Meal</a>
-      <a class="sidenav-links" href="/search_meal">Search Meal</a>
-      <a class="sidenav-links" href="/create">Create</a>
-      <a class="sidenav-links" href="/values">Values</a>
 
     </div>
 
@@ -77,10 +73,10 @@
         <div class="col-8">
           <h1 class="mt-2">Nutritions</h1>
           <hr class="mt-0 mb-4">
-          {% block content %}
-          {% endblock %}
         </div>
       </div>
+    {% block content %}
+    {% endblock %}
     </div>
 
     <!-- Optional JavaScript -->

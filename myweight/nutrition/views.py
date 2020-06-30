@@ -5,11 +5,10 @@ from django.urls import reverse
 from .models import Personal
 from django.contrib.auth.models import User
 from nutrition.choices import *
-from .models import Ingredient, Meal
 from datetime import date
-from .models import MealItem
 from .models import Food, Portion, Intake
 from .models import Measurement
+from .models import Diary
 from decimal import Decimal
 
 # Create your views here.
@@ -22,7 +21,12 @@ def home(response):
     try:
         presonal_info = Personal.objects.get(username=response.user)
     except Personal.DoesNotExist:
-        return render(response, "nutrition/add_personal_info.html", {})
+        return render(response, "nutrition/set_personal_info.html", {})
+
+    try:
+        Measurement.objects.filter(username=response.user)
+    except Measurement.DoesNotExist:
+        return render(response, "nutrition/set_personal_info.html", {})
 
     if response.method == "POST":
         weight = response.POST["weight"]
@@ -31,6 +35,10 @@ def home(response):
         bodywater = response.POST["bodyWater"]
         now = date.today().strftime("%Y-%m-%d")
 
+        present_height = float(Personal.objects.filter(username = user).last().present_height)
+        age = float(Personal.objects.filter(username = user).last().age)
+        activity_level = float(Personal.objects.filter(username = user).last().activity_level)
+        calorie_offset = float(Personal.objects.filter(username = user).last().planned_daily_offset)
 
         measurements = Measurement.objects.filter(username = user, date = now)
         if not measurements:
@@ -38,7 +46,7 @@ def home(response):
             measurements.save()
         Measurement.objects.filter(username = user, date = now).update(weight = weight, bmi = bmi, body_fat = bodyfat, body_water = bodywater)
 
-    latest_weight = float(Measurement.objects.filter(username = user).last().weight)
+    latest_weight = float(Measurement.objects.filter(username = user).order_by('-date')[0].weight)
     height = float(Personal.objects.get(username=user).present_height)
     age = float(Personal.objects.get(username=user).age)
     activity_level = float(Personal.objects.get(username=user).activity_level)
@@ -46,12 +54,17 @@ def home(response):
     bmr = 66.5 + (13.75 * latest_weight) + (5.003 * height) - (6.755 * age)
     tex = round((bmr * activity_level) + 0.1, 0)
     daily_calorie = tex + calorie_offset
+    Personal.objects.filter(username = user).update(needed_calorie = daily_calorie)
+
     context = {
         "personal_info":presonal_info,
-        "latest": Measurement.objects.filter(username = user).last(),
+        "latest": Measurement.objects.filter(username = user).order_by('-date')[:1][0],
         "bmr" : bmr,
         "tex": tex,
-        "daily_calorie": daily_calorie
+        "activity_level": activity_level,
+        "calorie_offset": calorie_offset,
+        "daily_calorie": daily_calorie,
+        "weights": Measurement.objects.filter(username = user).order_by('date')
     }
 
     return render(response, "nutrition/home.html", context)
@@ -59,18 +72,26 @@ def home(response):
 def set_personal_info(response):
     user = response.user
     if response.method == "POST":
-        present_height = response.POST["present_height"]
+        present_height = float(response.POST["present_height"])
         sex = response.POST["sex"]
-        age = response.POST["age"]
+        age = float(response.POST["age"])
         first_name = User.objects.get(username = user)
-        activity_level = response.POST["activity_level"]
-        planned_daily_offset = response.POST["planned_daily_offset"]
+        activity_level = float(response.POST["activity_level"])
+        planned_daily_offset = float(response.POST["planned_daily_offset"])
+        carb = float(response.POST["carb"])
+        protein = float(response.POST["protein"])
+        fat = float(response.POST["fat"])
 
         personal = Personal.objects.filter(username = user)
         if not personal:
-            personal = Personal(username = user, first_name = first_name, present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset)
+            personal = Personal(username = user, first_name = first_name, present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset, needed_carb = carb, needed_protein = protein, needed_fat = fat)
             personal.save()
-        Personal.objects.filter(username = user).update(present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset)
+        Personal.objects.filter(username = user).update(present_height = present_height, sex = sex, age = age, activity_level = activity_level, planned_daily_offset = planned_daily_offset, needed_carb = carb, needed_protein = protein, needed_fat = fat)
+
+        first_measurement = Measurement.objects.filter(username = user).first()
+        if not first_measurement:
+            first_measurement = Measurement(username = user)
+            first_measurement.save()
 
     context = {
         "personal": Personal.objects.get(username=response.user)
@@ -78,16 +99,62 @@ def set_personal_info(response):
 
     return render(response, "nutrition/set_personal_info.html", context)
 
-def search_meal(response):
-    if response.method == "GET":
-        context = {
-            "types": MEAL_CHOICES,
-            "sizes": (FULL_SIZE, SNACK, EXTRA),
-            "ingredients": Ingredient.objects.all()
-        }
-        return render(response, "nutrition/search_meal.html", context)
-    else:
-        return render(response, "nutrition/search_meal-html")
+def maintain_food_data(response):
+    print("maintain_food_data")
+    if response.method == "POST":
+        print("POST")
+        new_food = response.POST["new_food"]
+        new_name = Food.objects.filter(name = new_food)
+        if new_name:
+            context = {
+                "foods": Food.objects.all(),
+                "message" :"Food name is already taken, choose another name!"
+            }
+            return render(response, "nutrition/maintain_food_data.html", context)
+        new = Food(name=new_food)
+        new.save()
+        return food(response, new.id)
+
+
+
+    context = {
+        "foods": Food.objects.all()
+    }
+
+    return render(response, "nutrition/maintain_food_data.html", context)
+
+
+def food(response, food_id ):
+    print("food")
+    if response.method == "POST":
+        print("POST")
+        button_pressed = response.POST["button"]
+        if button_pressed == "Modify":
+            name = response.POST["name"]
+            id = response.POST["id"]
+            carb = float(response.POST["carb"])
+            fiber = float(response.POST["fiber"])
+            sugar = float(response.POST["sugar"])
+            protein = float(response.POST["protein"])
+            fat = float(response.POST["fat"])
+            calorie = float(response.POST["calorie"])
+
+            Food.objects.filter(id=id).update(name=name, carb=carb, fiber=fiber, sugar=sugar, protein=protein, fat=fat, calorie=calorie)
+        elif button_pressed == "Delete":
+            id = response.POST["id"]
+            Food.objects.get(id=id).delete()
+            context = {
+                "foods": Food.objects.all()
+            }
+
+            return render(response, "nutrition/maintain_food_data.html", context)
+
+
+    context = {
+        "food": Food.objects.get(id=food_id)
+    }
+
+    return render(response, "nutrition/food.html", context)
 
 def prepare_meal(response):
     today = date.today()
@@ -99,6 +166,7 @@ def add_meal_defined(response, date, meal_type):
     username = response.user
     if response.method == "POST":
         button_pressed = response.POST["add_meal_defined_button"]
+        meal_type = response.POST["meal_type"]
         if button_pressed == "Add":
             quantity = response.POST["quantity"]
             ingredient = response.POST["ingredient"]
@@ -115,6 +183,31 @@ def add_meal_defined(response, date, meal_type):
                 intake = Intake(user = username, date = date, meal_type = meal_type)
                 intake.save()
             intake.portions.add(portion)
+            diary = Diary.objects.filter(user = username, date = date, meal_type = meal_type).first()
+            if not diary:
+                diary = Diary(user = username, date = date, meal_type = meal_type)
+                diary.save()
+            carb = float(diary.carb) + float(quantity) * float(food.carb)
+            sugar = float(diary.sugar) + float(quantity) * float(food.sugar)
+            protein = float(diary.protein) + float(quantity) * float(food.protein)
+            fat = float(diary.fat) + float(quantity) * float(food.fat)
+            fiber = float(diary.fiber) + float(quantity) * float(food.fiber)
+            calorie = float(diary.calorie) + float(quantity) * float(food.calorie)
+
+            print("*-------------------------------------*")
+            print("carb:", str(carb), str(type(carb)))
+            print("sugar:", str(sugar), str(type(sugar)))
+            print("protein:", str(protein), str(type(protein)))
+            print("fat:", str(fat), str(type(fat)))
+            print("fiber:", str(fiber), str(type(fiber)))
+            print("calorie:", str(calorie), str(type(calorie)))
+            print("*-------------------------------------*")
+
+
+
+
+            Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = carb, sugar = sugar, protein = protein, fat = fat, fiber = fiber, calorie = calorie)
+
         elif button_pressed == "Change date/meal":
             date = response.POST["date"]
             meal_type = response.POST["meal_type"]
@@ -122,6 +215,8 @@ def add_meal_defined(response, date, meal_type):
             # update manytomany field in Intake
             intake = Intake.objects.filter(user = username, date = date, meal_type = meal_type).first()
             intake.portions.clear()
+            Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = 0, sugar = 0, protein = 0, fat = 0, fiber = 0, calorie = 0)
+
 
             food_in_table = response.POST.getlist('food_in_table')
             quantity_in_table = response.POST.getlist('quantity_in_table')
@@ -144,141 +239,62 @@ def add_meal_defined(response, date, meal_type):
                     intake = Intake(user = username, date = date, meal_type = meal_type)
                     intake.save()
                 intake.portions.add(portion)
+                diary = Diary.objects.filter(user = username, date = date, meal_type = meal_type).first()
+                if not diary:
+                    diary = Diary(user = username, date = date, meal_type = meal_type)
+                    diary.save()
+                carb = float(diary.carb) + float(quantity_in_table[i]) * float(food.carb)
+                sugar = float(diary.sugar) + float(quantity_in_table[i]) * float(food.sugar)
+                protein = float(diary.protein) + float(quantity_in_table[i]) * float(food.protein)
+                fat = float(diary.fat) + float(quantity_in_table[i]) * float(food.fat)
+                fiber = float(diary.fiber) + float(quantity_in_table[i]) * float(food.fiber)
+                calorie = float(diary.calorie) + float(quantity_in_table[i]) * float(food.calorie)
+                Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = carb, sugar = sugar, protein = protein, fat = fat, fiber = fiber, calorie = calorie)
+
+
+
+    if meal_type == "breakfast":
+        k = 4.0
+    elif meal_type == "lunch":
+        k = 4.0
+    elif meal_type == "snack1":
+        k = 8.0
+    elif meal_type == "dinner":
+        k = 4.0
+    elif meal_type == "snack2":
+        k = 8.0
+    else:
+        k = 4.0
+
+    calorie_needed = Personal.objects.filter(username = username).first().needed_calorie
+    needed_carb = Personal.objects.filter(username = username).first().needed_carb
+    needed_protein = Personal.objects.filter(username = username).first().needed_protein
+    needed_fat = Personal.objects.filter(username = username).first().needed_fat
+
+    calorie_per_carb = 4
+    calorie_per_protein = 4
+    calorie_per_fat = 9
+
+    print("needed_carb: " + str(needed_carb) + " calorie_needed: " + str(calorie_needed) + " calorie_per_carb: " + str(calorie_per_carb) + " k: " + str(k))
+
+    macros_needed = {
+        "carb": round((needed_carb / 100) * (calorie_needed / k) / calorie_per_carb, 2) ,
+        "fiber": 35 / k,
+        "sugar": 0,
+        "protein": round((needed_protein / 100) * (calorie_needed / k) / calorie_per_protein, 2),
+        "fat": round((needed_fat / 100) * (calorie_needed / k) / calorie_per_fat, 2),
+        "calorie": calorie_needed / k
+    }
 
     context = {
         "date": date,
         "meal_type": meal_type,
         "foods": Food.objects.all(),
-        "intakes": Intake.objects.filter(user = username, date = date, meal_type = meal_type)
+        "intakes": Intake.objects.filter(user = username, date = date, meal_type = meal_type),
+        "macros_needed" : macros_needed
     }
 
     return render(response, "nutrition/add_meal_defined.html", context)
-
-
-
-
-def add_meal(response):
-    username = response.user
-    today = date.today()
-    if response.method == "POST":
-        dict = {
-            "ingredient1":"quantity1",
-            "ingredient2":"quantity2",
-            "ingredient3":"quantity3",
-            "ingredient4":"quantity4",
-            "ingredient5":"quantity5",
-            "ingredient6":"quantity6",
-            "ingredient7":"quantity7",
-            "ingredient8":"quantity8",
-            "ingredient9":"quantity9",
-            "ingredient10":"quantity10"
-        }
-        ingredients = ["ingredient1", "ingredient2", "ingredient3", "ingredient4", "ingredient5", "ingredient6", "ingredient7", "ingredient8", "ingredient9", "ingredient10"]
-        quantities = ["quantity1", "quantity2", "quantity3", "quantity4", "quantity5", "quantity6", "quantity7", "quantity8", "quantity9", "quantity10"]
-        button_pressed = response.POST["add_meal_button"]
-        # selected_date = response.POST["date"]
-        # meal_type = response.POST["meal_type"]
-        # ingredient = response.POST["ingredient"]
-        if button_pressed == "Save":
-            print("Save button pressed")
-            selected_date = response.POST["date"]
-            meal_type = response.POST["meal_type"]
-            total = {'carb': 0, 'protein': 0, 'fiber': 0, 'calorie': 0}
-
-            add = MealItem.objects.filter(username=username, date=selected_date, meal_type=meal_type)
-            if not add:
-                add = MealItem(username=username, date=selected_date, meal_type=meal_type,\
-                                    ingredient1=response.POST["ingredient1"], quantity1 = 0 if response.POST["quantity1"] == '' else response.POST["quantity1"],\
-                                    ingredient2=response.POST["ingredient2"], quantity2 = 0 if response.POST["quantity2"] == '' else response.POST["quantity2"],\
-                                    ingredient3=response.POST["ingredient3"], quantity3 = 0 if response.POST["quantity3"] == '' else response.POST["quantity3"],\
-                                    ingredient4=response.POST["ingredient4"], quantity4 = 0 if response.POST["quantity4"] == '' else response.POST["quantity4"],\
-                                    ingredient5=response.POST["ingredient5"], quantity5 = 0 if response.POST["quantity5"] == '' else response.POST["quantity5"],\
-                                    ingredient6=response.POST["ingredient6"], quantity6 = 0 if response.POST["quantity6"] == '' else response.POST["quantity6"],\
-                                    ingredient7=response.POST["ingredient7"], quantity7 = 0 if response.POST["quantity7"] == '' else response.POST["quantity7"],\
-                                    ingredient8=response.POST["ingredient8"], quantity8 = 0 if response.POST["quantity8"] == '' else response.POST["quantity8"],\
-                                    ingredient9=response.POST["ingredient9"], quantity9 = 0 if response.POST["quantity9"] == '' else response.POST["quantity9"],\
-                                    ingredient10=response.POST["ingredient10"], quantity10 = 0 if response.POST["quantity10"] == '' else response.POST["quantity10"]
-                                    )
-                add.save()
-            else:
-                add.update(ingredient1=response.POST["ingredient1"], quantity1 = 0 if response.POST["quantity1"] == '' else response.POST["quantity1"],\
-                ingredient2=response.POST["ingredient2"], quantity2 = 0 if response.POST["quantity2"] == '' else response.POST["quantity2"],\
-                ingredient3=response.POST["ingredient3"], quantity3 = 0 if response.POST["quantity3"] == '' else response.POST["quantity3"],\
-                ingredient4=response.POST["ingredient4"], quantity4 = 0 if response.POST["quantity4"] == '' else response.POST["quantity4"],\
-                ingredient5=response.POST["ingredient5"], quantity5 = 0 if response.POST["quantity5"] == '' else response.POST["quantity5"],\
-                ingredient6=response.POST["ingredient6"], quantity6 = 0 if response.POST["quantity6"] == '' else response.POST["quantity6"],\
-                ingredient7=response.POST["ingredient7"], quantity7 = 0 if response.POST["quantity7"] == '' else response.POST["quantity7"],\
-                ingredient8=response.POST["ingredient8"], quantity8 = 0 if response.POST["quantity8"] == '' else response.POST["quantity8"],\
-                ingredient9=response.POST["ingredient9"], quantity9 = 0 if response.POST["quantity9"] == '' else response.POST["quantity9"],\
-                ingredient10=response.POST["ingredient10"], quantity10 = 0 if response.POST["quantity10"] == '' else response.POST["quantity10"]\
-                )
-
-
-            print("POST items:")
-            for key, value in response.POST.items():
-                print(key, value)
-                food = Ingredient.objects.filter(name=value).first()
-                print("Food: ")
-                print(food)
-                if food:
-                    total["carb"] += food.carb / 100 * quantity
-                    total["protein"] += food.protein / 100 * quantity
-                    total["fiber"] += food.fiber / 100 * quantity
-                    total["calorie"] += food.calorie / 100 * quantity
-            print(total)
-
-
-
-            items = MealItem.objects.filter(username=username, date=selected_date, meal_type=meal_type)
-            context = {
-                "date":selected_date,
-                "ingredients": Ingredient.objects.all(),
-                "items": items[0]
-            }
-
-            return render(response, "nutrition/add_meal.html", context)
-
-
-        elif button_pressed == "Change date/meal":
-            print("Change date/meal button pressed")
-            button_pressed = response.POST["add_meal_button"]
-            selected_date = response.POST["date"]
-            meal_type = response.POST["meal_type"]
-            items = MealItem.objects.filter(username=username, date=selected_date, meal_type=meal_type)
-
-            if not items:
-                pass_item = items
-            else:
-                pass_item = items[0]
-
-            context = {
-                "date":selected_date,
-                "ingredients": Ingredient.objects.all(),
-                "items": pass_item
-            }
-            return render(response, "nutrition/add_meal.html", context)
-
-        elif button_pressed == "Add":
-            print("Save button pressed")
-            for item in response.POST:
-                print(item)
-            return HttpResponseRedirect(reverse("add_meal"))
-
-
-    else:
-        context = {
-            "ingredients": Ingredient.objects.all(),
-            "date": today.strftime("%Y-%m-%d"),
-            "items": MealItem.objects.filter(username=username, date=today.strftime("%Y-%m-%d"), meal_type="breakfast")
-        }
-        return render(response, "nutrition/add_meal.html", context)
-
-
-def create(response):
-    return HttpResponse("create")
-
-def values(response):
-    return HttpResponse("values")
 
 def login_view(response):
     if response.method == "POST":
@@ -296,3 +312,26 @@ def login_view(response):
 def logout_request(response):
       logout(response)
       return render(response, "nutrition/login.html", {"message": "Logged out."})
+
+def register(response):
+    if response.method == "POST":
+        username = response.POST["username"]
+        first_name = response.POST["first_name"]
+        password = response.POST["password"]
+        password2 = response.POST["password2"]
+        email = response.POST["email"]
+
+        new_user = User.objects.filter(username = username)
+        if new_user:
+            return render(response, "nutrition/register.html", {"message": "Username is already taken. Please choose another one!"})
+
+        if password != password2:
+            return render(response, "nutrition/register.html", {"message": "Passwords are not the same!"})
+
+        user = User.objects.create_user(username, email, password)
+        user.first_name = first_name
+        user.save()
+
+        return HttpResponseRedirect(reverse("login"))
+    else:
+        return render(response, "nutrition/register.html")
