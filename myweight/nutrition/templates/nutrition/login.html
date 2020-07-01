@@ -1,0 +1,31 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+<div class="container">
+  <h1>Login</h1>
+  <div class="row">
+    <form action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group col">
+      <label for="usernameInput">Username</label>
+      <input type="text" class="form-control" id="usernameInput" name="username" placeholder="Enter username">
+    </div>
+    <div class="form-group  col">
+      <label for="passwordInput">Username</label>
+      <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password">
+    </div>
+    <input type="submit" class="btn btn-dark" value="Login">
+    <p>Or click <a href="/register">here</a> to register.</p>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

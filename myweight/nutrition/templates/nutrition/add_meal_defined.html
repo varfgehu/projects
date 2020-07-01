@@ -1,0 +1,233 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Prepare meal{% endblock %}
+
+{% block content %}
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+{% load static %}
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js">
+</script>
+
+<div class="container">
+  <h1>Prepare meal</h1>
+  <form action="{% url 'add_meal_defined' date meal_type %}" method="post">
+  <div class="row">
+    <div class="col-4">
+
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="dateInput">Date:</label>
+        <input class="form-control" type="date" id="dateInput" name="date" value="{{date}}">
+      </div>
+      <div class="form-group">
+        <label for="meal_type">Set the precise meal</label>
+        <input class="form-control" type="text" id="meal_type" name="meal_type" value="{{meal_type}}" list="meal_type_list">
+        <datalist id="meal_type_list">
+          <option>breakfast</option>
+          <option>lunch</option>
+          <option>snack1</option>
+          <option>dinner</option>
+          <option>snack2</option>
+        </datalist>
+      </div>
+      <input type="submit" class="btn btn-dark" name="add_meal_defined_button" value="Change date/meal">
+      <div class="form-group">
+        <label for="">Add your ingredients</label>
+        <div name="ingredients" class="form-group" class="ingredients">
+          <input class="input-control" type="number" id="quantity" name="quantity" value="" min="0" max="300"><span>gram  </span>
+          <input class="input-control" type="text" id="ingredient" name="ingredient" list="ingredients-list" value="">
+          <datalist id="ingredients-list">
+            {% for food in foods %}
+              <option>{{food.name}}</option>
+            {% endfor %}
+          </datalist>
+        </div>
+      <input class="btn btn-dark" type="submit" name="add_meal_defined_button" value="Add">
+      </div>
+      <input class="btn btn-dark" type="submit" name="add_meal_defined_button" value="Save">
+
+    </div>
+    <div class="col-8">
+      <div id="ChartContainer" style="height: 300px; width: 100%;">
+
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <br><hr><br>
+    <table class="table table-striped" id="sum_table">
+      <tr>
+        <th>Quantity</th>
+        <th>Food</th>
+        <th>Carb</th>
+        <th>Fiber</th>
+        <th>Sugar</th>
+        <th>Protein</th>
+        <th>Fat</th>
+        <th>Calorie</th>
+      </tr>
+      {% for intake in intakes %}
+        {% for portion in intake.portions.all %}
+        <tr>
+          <td><input type="number" name="quantity_in_table" value="{{portion.quantity}}" min="0" max="500" onchange=update()><span>g</span></td>
+          <td><input type="hidden" name="food_in_table" value="{{portion.foods}}">{{portion.foods}}</td>
+          <td><input type="hidden" name="{{portion.foods}}_carb" value="{{portion.foods.carb}}"><span>{% widthratio portion.foods.carb 1 portion.quantity %}</span></td>
+          <td><input type="hidden" name="{{portion.foods}}_fiber" value="{{portion.foods.fiber}}"><span>{% widthratio portion.foods.fiber 1 portion.quantity %}</span></td>
+          <td><input type="hidden" name="{{portion.foods}}_sugar" value="{{portion.foods.sugar}}"><span>{% widthratio portion.foods.sugar 1 portion.quantity %}</span></td>
+          <td><input type="hidden" name="{{portion.foods}}_protein" value="{{portion.foods.protein}}"><span>{% widthratio portion.foods.protein 1 portion.quantity %}</span></td>
+          <td><input type="hidden" name="{{portion.foods}}_fat" value="{{portion.foods.fat}}"><span>{% widthratio portion.foods.fat 1 portion.quantity %}</span></td>
+          <td><input type="hidden" name="{{portion.foods}}_calorie" value="{{portion.foods.calorie}}"><span>{% widthratio portion.foods.calorie 1 portion.quantity %}</span></td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+      <tr>
+        <td>Total</td>
+        <td></td>
+        <td><span>total carb</span></td>
+        <td><span>total fiber</span></td>
+        <td><span>total sugar</span></td>
+        <td><span>total protein</span></td>
+        <td><span>total fat</span></td>
+        <td><span>total calorie</span></td>
+      </tr>
+      <tr>
+        <td>Needed</td>
+        <td></td>
+        <td><span>{{macros_needed.carb}}</span></td>
+        <td><span>{{macros_needed.fiber}}</span></td>
+        <td><span>min</span></td>
+        <td><span>{{macros_needed.protein}}</span></td>
+        <td><span>{{macros_needed.fat}}</span></td>
+        <td><span>{{macros_needed.calorie}}</span></td>
+      </tr>
+    </table>
+  </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("meal_type").onclick = function() {
+      document.getElementById("meal_type").value = "";
+    };
+    update();
+  });
+
+  function recalculate() {
+    var table = document.getElementById('sum_table');
+    for (var row = 1, number_of_rows = table.rows.length - 2; row < number_of_rows; row++) {
+        var quantity = table.rows[row].cells[0].querySelector('input').value
+        for (var column = 2, number_of_columns = table.rows[row].cells.length; column < number_of_columns; column++) {
+            table.rows[row].cells[column].querySelector('span').innerText = Number(table.rows[row].cells[column].querySelector('input').value * quantity).toFixed(2);
+        }
+    }
+
+    for (var column = 2, number_of_columns = table.rows[0].cells.length; column < number_of_columns; column++ ) {
+      for ( var row = 1, number_of_rows = table.rows.length - 3, sum = 0; row <= number_of_rows; row ++ ) {
+          sum += Number(table.rows[row].cells[column].querySelector('span').innerText);
+      }
+      table.rows[table.rows.length-2].cells[column].querySelector('span').innerText = Number(sum).toFixed(2);
+    }
+  }
+
+  function draw_cart(){
+    var chart = new CanvasJS.Chart("ChartContainer", {
+      title:{
+        text: "Nutrition needs overviews"
+      },
+      axisX:{
+        title:"Macros"
+      },
+      axisY:
+      {
+        title:"Nutritions"
+      },
+      axisY2:
+      {
+        title:"Calorie"
+      }
+    ,
+
+      data: [
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "column",
+        dataPoints: [
+          { x: 1, label: "Carb", y: 0 },
+          { x: 2, label: "Fiber", y: 0 },
+          { x: 3, label: "Sugar", y: 0 },
+          { x: 4, label: "Protein", y: 0 },
+          { x: 5 ,label: "Fat", y: 0 }
+        ]
+      },
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "error",
+        showInLegend: false,
+        markerType: "line",
+        dataPoints: [
+          { x: 1, label: "Carb", y: 0 },
+          { x: 2, label: "Fiber", y: 0 },
+          { x: 3, label: "Sugar", y: 0 },
+          { x: 4, label: "Protein", y: 0 },
+          { x: 5 ,label: "Fat", y: 0 }
+        ]
+      },
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "column",
+        axisYType: "secondary",
+        axisYIndex: 1,
+        dataPoints: [
+          { x: 6, label: "Calorie", y: 0 }
+        ]
+      },
+      {
+        // Change type to "doughnut", "line", "splineArea", etc.
+        type: "error",
+        axisYType: "secondary",
+        showInLegend: false,
+        markerType: "line",
+        axisYIndex: 1,
+        dataPoints: [
+          { x: 6, label: "Calorie", y: 0 }
+        ]
+      }
+      ]
+    });
+
+    var table = document.getElementById('sum_table');
+    var table_rows = table.rows.length;
+    var table_columns = table.rows[0].cells.length;
+
+    chart.options.data[0].dataPoints[0].y = parseFloat(table.rows[table_rows - 2].cells[2].querySelector('span').innerText);
+    chart.options.data[0].dataPoints[1].y = parseFloat(table.rows[table_rows - 2].cells[3].querySelector('span').innerText);
+    chart.options.data[0].dataPoints[2].y = parseFloat(table.rows[table_rows - 2].cells[4].querySelector('span').innerText);
+    chart.options.data[0].dataPoints[3].y = parseFloat(table.rows[table_rows - 2].cells[5].querySelector('span').innerText);
+    chart.options.data[0].dataPoints[4].y = parseFloat(table.rows[table_rows - 2].cells[6].querySelector('span').innerText);
+
+    chart.options.data[1].dataPoints[0].y = [parseFloat(table.rows[table_rows - 1].cells[2].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[2].querySelector('span').innerText)];
+    chart.options.data[1].dataPoints[1].y = [parseFloat(table.rows[table_rows - 1].cells[3].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[3].querySelector('span').innerText)];
+    chart.options.data[1].dataPoints[2].y = [parseFloat(table.rows[table_rows - 1].cells[4].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[4].querySelector('span').innerText)];
+    chart.options.data[1].dataPoints[3].y = [parseFloat(table.rows[table_rows - 1].cells[5].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[5].querySelector('span').innerText)];
+    chart.options.data[1].dataPoints[4].y = [parseFloat(table.rows[table_rows - 1].cells[6].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[6].querySelector('span').innerText)];
+
+    chart.options.data[2].dataPoints[0].y = parseFloat(table.rows[table_rows - 2].cells[7].querySelector('span').innerText);
+    chart.options.data[3].dataPoints[0].y = [parseFloat(table.rows[table_rows - 1].cells[7].querySelector('span').innerText), parseFloat(table.rows[table_rows - 1].cells[7].querySelector('span').innerText)];
+
+    chart.render();
+  }
+
+  function update(){
+    recalculate();
+    draw_cart();
+  }
+</script>
+
+{% endblock %}

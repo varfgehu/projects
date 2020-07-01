@@ -1,0 +1,214 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js">
+</script>
+
+<div class="container">
+  <div class="row">
+    <div class="col-4">
+      <h4>Display personal info</h4>
+
+      <p>Hi, {{personal_info.first_name}}! Please check your data.</p>
+      <p>Age: {{ personal_info.age }}</p>
+      <p>Sex: {{ personal_info.sex }}</p>
+      <p>Height: {{ personal_info.present_height }} cm</p>
+
+      <br><hr><br>
+
+      <h4>Add today's measurements</h4>
+      <form class="" action="{% url 'home' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="weigthInput">Weight[kg]:</label>
+          <input type="number" class="form-control" id="weigthInput" name="weight" step="0.1">
+        </div>
+        <div class="form-group">
+          <label for="bmiInput">BMI[1]:</label>
+          <input type="number" class="form-control" id="bmiInput" name="bmi" step="0.1">
+        </div>
+        <div class="form-group">
+          <label for="bodyFatInput">Body Fat[%]:</label>
+          <input type="number" class="form-control" id="bodyFatInput" name="bodyFat" step="0.1">
+        </div>
+        <div class="form-group">
+          <label for="bodyWaterInput">Body Water[%]:</label>
+          <input type="number" class="form-control" id="bodyWaterInput" name="bodyWater" step="0.1">
+        </div>
+        <input type="submit" class="btn btn-dark" name="home_button" value="Submit">
+        <div class="">
+          <small>If you already have submitted your measurements, you can update them by resubmitting.</small>
+        </div>
+      </form>
+    </div>
+    <div class="col-8">
+      <div class="row">
+        <div class="col">
+          <h4>Latest measurements</h4>
+          <div class="">
+            <label for="">Date:</label>
+            <span>{{latest.date}}</span>
+          </div>
+          <div class="">
+            <label for="">Weight:</label>
+            <span>{{latest.weight}} kg</span>
+          </div>
+          <div class="">
+            <label for="">BMI:</label>
+            <span>{{latest.bmi}}</span>
+          </div>
+          <div class="">
+            <label for="">Body Fat:</label>
+            <span>{{latest.body_fat}} % </span>
+          </div>
+          <div class="">
+            <label for="">Body Water:</label>
+            <span>{{latest.body_water}} %</span>
+          </div>
+        </div>
+        <div class="col">
+          <h4>Calculations</h4>
+          <div>
+            <label>BMR:</label>
+            <span>{{bmr}} kcal</span>
+          </div>
+          <div>
+            <label>Physical Activity Level:</label>
+            <span>{{activity_level}}</span>
+          </div>
+          <div>
+            <label>Total Energy Expaditure:</label>
+            <span>{{tex}} kcal</span>
+          </div>
+          <div>
+            <label>Daily Calorie Offset:</label>
+            <span>{{calorie_offset}} kcal</span>
+          </div>
+          <div>
+            <label>Daily Calorie:</label>
+            <span>{{daily_calorie}} kcal</span>
+          </div>
+        </div>
+      </div>
+      <br><hr><br>
+      <div id="ChartContainer" style="height: 600px; width: 100%;">
+
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-striped" id="weight_table">
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Weight</th>
+          <th scope="col">BMI</th>
+          <th scope="col">Body Fat</th>
+          <th scope="col">Body Water</th>
+        </tr>
+          {% for weight in weights %}
+          <tr>
+            <td scope="row">{{weight.date}}</td>
+            <td>{{weight.weight}}</td>
+            <td>{{weight.bmi}}</td>
+            <td>{{weight.body_fat}}</td>
+            <td>{{weight.body_water}}</td>
+          </tr>
+          {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var dataPoints0=[];
+  var dataPoints1=[];
+  var dataPoints2=[];
+  var dataPoints3=[];
+  document.addEventListener('DOMContentLoaded', () => {
+
+    draw_weigth();
+  });
+
+  function draw_chart(){
+    var chart = new CanvasJS.Chart("ChartContainer", {
+      zoomEnabled: true,
+      title:{
+        text: "Weigth progess"
+      },
+      axisX:{
+        title:"Date",
+        labelAngle: -90
+      },
+      axisY:
+      {
+        title:"Weight [kg]",
+        maximum: 90,
+        minimum: 75
+      },
+      axisY2:
+      {
+        title:"%",
+        minimum: 25,
+        maximum: 60
+      }
+    ,
+
+      data: [
+      {
+        type: "line",
+        showInLegend: true,
+        legendText: "weigth [kg]",
+        dataPoints: dataPoints0
+      },
+      {
+        type: "line",
+        showInLegend: true,
+        legendText: "BMI [1]",
+        dataPoints: dataPoints1,
+        axisYType: "secondary",
+      },
+      {
+        type: "line",
+        showInLegend: true,
+        legendText: "Body Fat [%]",
+        dataPoints: dataPoints2,
+        axisYType: "secondary",
+      },
+      {
+        type: "line",
+        showInLegend: true,
+        legendText: "Body Water [%]",
+        dataPoints: dataPoints3,
+        axisYType: "secondary",
+      }
+      ]
+    });
+
+    var table = document.getElementById('weight_table');
+    var table_rows = table.rows.length;
+    var table_columns = table.rows[0].cells.length;
+
+    for ( var row = 1, number_of_rows = table.rows.length; row < number_of_rows; row++ ) {
+      dataPoints0.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[1].innerText) });
+      dataPoints1.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[2].innerText) });
+      dataPoints2.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[3].innerText) });
+      dataPoints3.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[4].innerText) });
+    }
+
+    chart.render();
+
+    }
+
+    function draw_weigth() {
+      draw_chart();
+    }
+</script>
+
+{% endblock %}
