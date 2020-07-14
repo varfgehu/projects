@@ -48,11 +48,59 @@
         margin-left: 160px;
         padding: 0px 10px;
       }
+
+      @media screen and (max-width:600px) {
+        .sidenav {
+          height: 100%;
+          width:80px;
+          position: fixed;
+          z-index:1;
+          top:0;
+          left:0;
+          background-color: #111;
+          overflow-x: :hidden;
+          padding-top:16px;
+        }
+
+        .sidenav-links {
+          padding: 3px 4px 4px 8px;
+          text-decoration: none;
+          font-size: 16px;
+          color: #818181;
+          display:block;
+        }
+        .sidenav-links:hover{
+          color:#f1f1f1;
+        }
+        .sidenav-user{
+          padding: 0px 0px 0px 0px;
+          margin-bottom: 0px;
+          background-color: #111;
+          color:#f1f1f1;
+          text-decoration: none;
+          font-size: 12px;
+        }
+        .sidenav-user a:hover{
+          color: #818181;
+        }
+
+        .main{
+          margin-left: 80px;
+          padding: 0px 10px;
+          font-size: 16px;
+        }
+        h1 {
+          font-size: 1.2rem;
+        }
+        h4 {
+          font-size: 1rem;
+        }
+      }
     </style>
 
   </head>
   <body>
-    <div class="sidenav">
+    <div id="sidebar" class="sidenav">
       {% if user.is_authenticated %}
         <p class="sidenav-user">Welcome, {{user.username}}!</p>
         <p class="sidenav-user"><a class="sidenav-user" href="/log_out">Logout</a></p>
@@ -88,6 +136,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/bloodhound.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.jquery.min.js"></script>
+
+    <script type="text/javascript">
+      if ($(window).width() < 922) {
+        $('#sidebar').collapse({
+          toggle: false
+          });
+      } else {
+        $('#sidebar').collapse({
+          toggle: true
+          });
+      }
+    </script>
 
   </body>
 </html>

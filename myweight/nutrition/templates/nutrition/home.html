@@ -9,9 +9,9 @@ Home
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js">
 </script>
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-4">
+    <div class="col-xs-12 col-sm-4">
       <h4>Display personal info</h4>
 
       <p>Hi, {{personal_info.first_name}}! Please check your data.</p>
@@ -46,9 +46,9 @@ Home
         </div>
       </form>
     </div>
-    <div class="col-8">
+    <div class="col-xs-12 col-sm-8">
       <div class="row">
-        <div class="col">
+        <div class="col-xs-12 col-sm-6">
           <h4>Latest measurements</h4>
           <div class="">
             <label for="">Date:</label>
@@ -71,7 +71,7 @@ Home
             <span>{{latest.body_water}} %</span>
           </div>
         </div>
-        <div class="col">
+        <div class="col-xs-12 col-sm-6">
           <h4>Calculations</h4>
           <div>
             <label>BMR:</label>
@@ -102,7 +102,7 @@ Home
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-xs-12 col-sm-12">
       <table class="table table-striped" id="weight_table">
         <tr>
           <th scope="col">Date</th>
@@ -139,8 +139,25 @@ Home
   function draw_chart(){
     var chart = new CanvasJS.Chart("ChartContainer", {
       zoomEnabled: true,
+      toolTip: {
+        shared: true  //disable here.
+      },
       title:{
         text: "Weigth progess"
+      },
+      legend: {
+            cursor: "pointer",
+            itemclick: function (e) {
+                //console.log("legend click: " + e.dataPointIndex);
+                //console.log(e);
+                if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                    e.dataSeries.visible = false;
+                } else {
+                    e.dataSeries.visible = true;
+                }
+
+                e.chart.render();
+            }
       },
       axisX:{
         title:"Date",
@@ -149,14 +166,22 @@ Home
       axisY:
       {
         title:"Weight [kg]",
-        maximum: 90,
-        minimum: 75
+        includeZero: false,
+		      scaleBreaks: {
+			        autoCalculate: true
+		      }
+        // maximum: 90,
+        // minimum: 75
       },
       axisY2:
       {
         title:"%",
-        minimum: 25,
-        maximum: 60
+        includeZero: false,
+		      scaleBreaks: {
+			        autoCalculate: true
+		      }
+        // minimum: 25,
+        // maximum: 60
       }
     ,
 
@@ -196,10 +221,15 @@ Home
     var table_columns = table.rows[0].cells.length;
 
     for ( var row = 1, number_of_rows = table.rows.length; row < number_of_rows; row++ ) {
-      dataPoints0.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[1].innerText) });
-      dataPoints1.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[2].innerText) });
-      dataPoints2.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[3].innerText) });
-      dataPoints3.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[4].innerText) });
+      dataPoints0.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[1].innerText) });
+      dataPoints1.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[2].innerText) });
+      dataPoints2.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[3].innerText) });
+      dataPoints3.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[4].innerText) });
+
+      // dataPoints0.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[1].innerText) });
+      // dataPoints1.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[2].innerText) });
+      // dataPoints2.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[3].innerText) });
+      // dataPoints3.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[4].innerText) });
     }
 
     chart.render();
