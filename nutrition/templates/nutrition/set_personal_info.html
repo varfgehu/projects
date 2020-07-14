@@ -1,0 +1,69 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Personal Info{% endblock %}
+
+{% block content %}
+
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+
+<div class="container">
+  <h1>Set Personal Data</h1>
+  <div class="row">
+    <div class="col-4">
+      <form action="{% url 'set_personal_info' %}" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="heightInput">Height [cm]</label>
+        <input type="text" class="form-control" id="heightInput" name="present_height" value="{{personal.present_height}}" placeholder="Enter your height in cm">
+      </div>
+      <div class="form-group">
+        <label for="sexInput">Sex</label>
+        <input type="text" class="form-control" id="sexInput" name="sex" value="{{personal.sex}}" list="sex_list">
+        <datalist id="sex_list">
+          <option >male</option>
+          <option >female</option>
+        </datalist>
+      </div>
+      <div class="form-group">
+        <label for="ageInput">Age</label>
+        <input type="text" class="form-control" id="ageInput" name="age" value="{{personal.age}}">
+      </div>
+      <div class="form-group">
+        <label for="activityInput">Activity level</label>
+        <input type="number" class="form-control" id="activityInput" name="activity_level" step="0.01" value="{{personal.activity_level}}">
+      </div>
+      <div class="form-group">
+        <label for="calorieOffsetInput">Calorie offset [kcal]</label>
+        <input type="number" class="form-control" id="calorieOffsetInput" name="planned_daily_offset" value="{{personal.planned_daily_offset}}">
+        <div>
+          <small>Deficit or surplus. For deficit set a negative value</small>
+        </div>
+      </div>
+      <br><hr><br>
+      <h4>Set nutrition intake</h4>
+      <div class="form-group">
+        <label for="carbsInput">Carbs [%]:</label>
+        <input type="number" class="form-control" id="carbsInput" name="carb" value="{{personal.needed_carb}}">
+      </div>
+      <div class="form-group">
+        <label for="proteinInput">Protein [%]:</label>
+        <input type="number" class="form-control" id="proteinInput" name="protein" value="{{personal.needed_protein}}">
+      </div>
+      <div class="form-group">
+        <label for="fatInput">Fat [%]:</label>
+        <input type="number"class="form-control" id="fatInput" name="fat" value="{{personal.needed_fat}}">
+        <div class="">
+          <small>Please make sure, that the SUM of your macros is 100%! </small>
+        </div>
+      </div>
+      <input type="submit" class="btn btn-dark" value="Set/update">
+      <br>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
