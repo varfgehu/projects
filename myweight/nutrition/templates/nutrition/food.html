@@ -1,0 +1,67 @@
+
+{% extends 'nutrition/base.html' %}
+
+{% block title %}{{food.name}}{% endblock %}
+
+{% block content %}
+<h1>Modify Food Data</h1>
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+<h4>{{food.name}}</h4>
+<form action="{% url 'food' food.id %}" method="post">
+  {% csrf_token %}
+<div class="form-group">
+  <label for="">Name:</label>
+  <input type="text" name="name" value="{{food.name}}">
+  <input type="hidden" name="id" value="{{food.id}}">
+</div>
+<div class="form-group">
+  <label for="">Carb [g]:</label>
+  <input type="text" name="carb" value="{{food.carb}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<div class="form-group">
+  <label for="">Fiber [g]:</label>
+  <input type="text" name="fiber" value="{{food.fiber}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<div class="form-group">
+  <label for="">Sugar [g]:</label>
+  <input type="text" name="sugar" value="{{food.sugar}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<div class="form-group">
+  <label for="">Protein [g]:</label>
+  <input type="text" name="protein" value="{{food.protein}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<div class="form-group">
+  <label for="">Fat [g]:</label>
+  <input type="text" name="fat" value="{{food.fat}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<div class="form-group">
+  <label for="">Calorie [kcal]:</label>
+  <input type="text" name="calorie" value="{{food.calorie}}">
+  <div class="">
+    <small>Enter value for 1g</small>
+  </div>
+</div>
+<input type="submit" name="button" value="Modify">
+<input type="submit" name="button" value="Delete">
+</form>
+
+{% endblock %}

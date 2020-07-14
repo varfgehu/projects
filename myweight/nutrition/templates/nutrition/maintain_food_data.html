@@ -1,0 +1,66 @@
+{% extends 'nutrition/base.html' %}
+
+{% block title %}Maintain Food Data{% endblock %}
+
+{% block content %}
+
+{% if message %}
+<div>
+{{message}}
+</div>
+{% endif %}
+<div class="container">
+  <h1>Maintain Food Data</h1>
+  <div class="row">
+    <div class="col-4">
+      <h4>Add New Food</h4>
+      <form class="" action="{% url 'maintain_food_data' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="newFoodInput">Name:</label>
+          <input type="text" class="form-control" id="newFoodInput" name="new_food" placeholder="Name your food">
+        </div>
+        <input type="submit" class="btn btn-dark" name="button" value="Add">
+      </form>
+      <br><hr><br>
+      <h4>Your Foods:</h4>
+      <h6>Search</h6>
+      <div class="form-group">
+        <label for="foodInput">Foods:</label>
+        <input type="text" class="form-control" id="foodInput" onkeyup="searchFunction()" name="food" placeholder="Search for foods..">
+      </div>
+      <div class="">
+        <h6>Choose from the list:</h6>
+        <ul id="foodList">
+          {% for food in foods %}
+            <li name="{{food.id}}"><a href="{% url 'food' food.id %}">{{food.name}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function searchFunction() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('foodInput');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("foodList");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+{% endblock %}
