@@ -20,44 +20,44 @@
 </div>
 <div class="form-group">
   <label for="">Carb [g]:</label>
-  <input type="text" name="carb" value="{{food.carb}}">
+  <input type="text" name="carb" value="{% widthratio food.carb 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <div class="form-group">
   <label for="">Fiber [g]:</label>
-  <input type="text" name="fiber" value="{{food.fiber}}">
+  <input type="text" name="fiber" value="{% widthratio food.fiber 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <div class="form-group">
   <label for="">Sugar [g]:</label>
-  <input type="text" name="sugar" value="{{food.sugar}}">
+  <input type="text" name="sugar" value="{% widthratio food.sugar 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <div class="form-group">
   <label for="">Protein [g]:</label>
-  <input type="text" name="protein" value="{{food.protein}}">
+  <input type="text" name="protein" value="{% widthratio food.protein 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <div class="form-group">
   <label for="">Fat [g]:</label>
-  <input type="text" name="fat" value="{{food.fat}}">
+  <input type="text" name="fat" value="{% widthratio food.fat 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <div class="form-group">
   <label for="">Calorie [kcal]:</label>
-  <input type="text" name="calorie" value="{{food.calorie}}">
+  <input type="text" name="calorie" value="{% widthratio food.calorie 1 100 %}">
   <div class="">
-    <small>Enter value for 1g</small>
+    <small>Enter value for 100g</small>
   </div>
 </div>
 <input type="submit" name="button" value="Modify">

@@ -10,6 +10,9 @@ from .models import Food, Portion, Intake
 from .models import Measurement
 from .models import Diary
 from decimal import Decimal
+from nutrition.access_measurement import *
+from nutrition.access_personal import *
+from nutrition.helper import *
 
 # Create your views here.
 def home(response):
@@ -19,12 +22,12 @@ def home(response):
         return render(response, "nutrition/login.html", {"message": None})
 
     try:
-        presonal_info = Personal.objects.get(username=response.user)
+        presonal_info = get_personal_object_by_name(response.user)
     except Personal.DoesNotExist:
         return render(response, "nutrition/set_personal_info.html", {})
 
     try:
-        Measurement.objects.filter(username=response.user)
+        is_user_measurement_exists(response.user)
     except Measurement.DoesNotExist:
         return render(response, "nutrition/set_personal_info.html", {})
 
@@ -35,36 +38,31 @@ def home(response):
         bodywater = response.POST["bodyWater"]
         now = date.today().strftime("%Y-%m-%d")
 
-        present_height = float(Personal.objects.filter(username = user).last().present_height)
-        age = float(Personal.objects.filter(username = user).last().age)
-        activity_level = float(Personal.objects.filter(username = user).last().activity_level)
-        calorie_offset = float(Personal.objects.filter(username = user).last().planned_daily_offset)
-
-        measurements = Measurement.objects.filter(username = user, date = now)
+        measurements = get_todays_measurement(response.user, now)
         if not measurements:
             measurements = Measurement(username = user, date = now)
             measurements.save()
         Measurement.objects.filter(username = user, date = now).update(weight = weight, bmi = bmi, body_fat = bodyfat, body_water = bodywater)
 
-    latest_weight = float(Measurement.objects.filter(username = user).order_by('-date')[0].weight)
-    height = float(Personal.objects.get(username=user).present_height)
-    age = float(Personal.objects.get(username=user).age)
-    activity_level = float(Personal.objects.get(username=user).activity_level)
-    calorie_offset = float(Personal.objects.get(username=user).planned_daily_offset)
-    bmr = 66.5 + (13.75 * latest_weight) + (5.003 * height) - (6.755 * age)
-    tex = round((bmr * activity_level) + 0.1, 0)
+    latest_weight = float(get_latast_weight(response.user).weight)
+    height = float(get_height(response.user))
+    age = float(get_age(response.user))
+    activity_level = get_activity_level(response.user)
+    calorie_offset = float(get_calorie_offset(response.user))
+    bmr = calculate_bmr(latest_weight, height, age)
+    tex = calculate_tex(bmr, activity_level)
     daily_calorie = tex + calorie_offset
-    Personal.objects.filter(username = user).update(needed_calorie = daily_calorie)
+    update_needed_calorie(response.user, daily_calorie)
 
     context = {
         "personal_info":presonal_info,
-        "latest": Measurement.objects.filter(username = user).order_by('-date')[:1][0],
+        "latest": get_latast_weight(response.user),
         "bmr" : bmr,
         "tex": tex,
         "activity_level": activity_level,
         "calorie_offset": calorie_offset,
         "daily_calorie": daily_calorie,
-        "weights": Measurement.objects.filter(username = user).order_by('date')
+        "weights": get_all_weights(response.user)
     }
 
     return render(response, "nutrition/home.html", context)
@@ -115,8 +113,6 @@ def maintain_food_data(response):
         new.save()
         return food(response, new.id)
 
-
-
     context = {
         "foods": Food.objects.all()
     }
@@ -132,12 +128,12 @@ def food(response, food_id ):
         if button_pressed == "Modify":
             name = response.POST["name"]
             id = response.POST["id"]
-            carb = float(response.POST["carb"])
-            fiber = float(response.POST["fiber"])
-            sugar = float(response.POST["sugar"])
-            protein = float(response.POST["protein"])
-            fat = float(response.POST["fat"])
-            calorie = float(response.POST["calorie"])
+            carb = float(response.POST["carb"]) / 100.0
+            fiber = float(response.POST["fiber"]) / 100.0
+            sugar = float(response.POST["sugar"]) / 100.0
+            protein = float(response.POST["protein"]) / 100.0
+            fat = float(response.POST["fat"]) / 100.0
+            calorie = float(response.POST["calorie"]) / 100.0
 
             Food.objects.filter(id=id).update(name=name, carb=carb, fiber=fiber, sugar=sugar, protein=protein, fat=fat, calorie=calorie)
         elif button_pressed == "Delete":
@@ -159,7 +155,7 @@ def food(response, food_id ):
 def prepare_meal(response):
     today = date.today()
     now = today.strftime("%Y-%m-%d")
-    meal_type = "breafast"
+    meal_type = "breakfast"
     return add_meal_defined(response, now, meal_type)
 
 def add_meal_defined(response, date, meal_type):
@@ -194,18 +190,6 @@ def add_meal_defined(response, date, meal_type):
             fiber = float(diary.fiber) + float(quantity) * float(food.fiber)
             calorie = float(diary.calorie) + float(quantity) * float(food.calorie)
 
-            print("*-------------------------------------*")
-            print("carb:", str(carb), str(type(carb)))
-            print("sugar:", str(sugar), str(type(sugar)))
-            print("protein:", str(protein), str(type(protein)))
-            print("fat:", str(fat), str(type(fat)))
-            print("fiber:", str(fiber), str(type(fiber)))
-            print("calorie:", str(calorie), str(type(calorie)))
-            print("*-------------------------------------*")
-
-
-
-
             Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = carb, sugar = sugar, protein = protein, fat = fat, fiber = fiber, calorie = calorie)
 
         elif button_pressed == "Change date/meal":
@@ -216,7 +200,6 @@ def add_meal_defined(response, date, meal_type):
             intake = Intake.objects.filter(user = username, date = date, meal_type = meal_type).first()
             intake.portions.clear()
             Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = 0, sugar = 0, protein = 0, fat = 0, fiber = 0, calorie = 0)
-
 
             food_in_table = response.POST.getlist('food_in_table')
             quantity_in_table = response.POST.getlist('quantity_in_table')
@@ -250,8 +233,6 @@ def add_meal_defined(response, date, meal_type):
                 fiber = float(diary.fiber) + float(quantity_in_table[i]) * float(food.fiber)
                 calorie = float(diary.calorie) + float(quantity_in_table[i]) * float(food.calorie)
                 Diary.objects.filter(user = username, date = date, meal_type = meal_type).update(carb = carb, sugar = sugar, protein = protein, fat = fat, fiber = fiber, calorie = calorie)
-
-
 
     if meal_type == "breakfast":
         k = 4.0

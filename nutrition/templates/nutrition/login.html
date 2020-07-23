@@ -10,7 +10,7 @@
 {% endif %}
 
 <div class="container">
-  <h1>Login</h1>
+  <h1 id="page_title">Login</h1>
   <div class="row">
     <form action="{% url 'login' %}" method="post">
     {% csrf_token %}
@@ -22,7 +22,7 @@
       <label for="passwordInput">Username</label>
       <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password">
     </div>
-    <input type="submit" class="btn btn-dark" value="Login">
+    <input type="submit" id="login_button" class="btn btn-dark" value="Login">
     <p>Or click <a href="/register">here</a> to register.</p>
     </form>
 

@@ -138,69 +138,78 @@ Home
 
   function draw_chart(){
     var chart = new CanvasJS.Chart("ChartContainer", {
+      animationEnabled: true,
       zoomEnabled: true,
-      toolTip: {
-        shared: true  //disable here.
-      },
       title:{
         text: "Weigth progess"
       },
-      legend: {
-            cursor: "pointer",
-            itemclick: function (e) {
-                //console.log("legend click: " + e.dataPointIndex);
-                //console.log(e);
-                if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                    e.dataSeries.visible = false;
-                } else {
-                    e.dataSeries.visible = true;
-                }
-
-                e.chart.render();
-            }
-      },
       axisX:{
         title:"Date",
+        labelFormatter: function (e) {
+				  return CanvasJS.formatDate( e.value, "YYYY MMM DD");
+          },
         labelAngle: -90
       },
       axisY:
       {
         title:"Weight [kg]",
-        includeZero: false,
-		      scaleBreaks: {
-			        autoCalculate: true
-		      }
-        // maximum: 90,
-        // minimum: 75
+        suffix: "kg",
       },
       axisY2:
       {
         title:"%",
         includeZero: false,
-		      scaleBreaks: {
-			        autoCalculate: true
-		      }
-        // minimum: 25,
-        // maximum: 60
+        scaleBreaks :{
+          autoCalculate: true
+        }
       }
     ,
+    legend: {
+          cursor: "pointer",
+          itemclick: function (e) {
+              //console.log("legend click: " + e.dataPointIndex);
+              //console.log(e);
+              if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                  e.dataSeries.visible = false;
+              } else {
+                  e.dataSeries.visible = true;
+              }
 
+              e.chart.render();
+          }
+      },
+      toolTip: {
+        shared: true,
+        // contentFormatter: function(e){
+        //   var str = e.dataPoint.x + "<br/>";
+        //   for (var i = 0; i < e.entries.length; i++){
+        //     var  temp = e.entries[i].dataSeries.name + " <strong>"+  e.entries[i].dataPoint.y + "</strong> <br/>" ;
+        //     str = str.concat(temp);
+        //   }
+        //   return (str);
+        // }
+      },
       data: [
       {
         type: "line",
+        name: "Weight",
         showInLegend: true,
         legendText: "weigth [kg]",
+        yValueFormatString:"###.# kg",
         dataPoints: dataPoints0
       },
       {
         type: "line",
+        name: "BMI",
         showInLegend: true,
         legendText: "BMI [1]",
+        yValueFormatString:"##.#",
         dataPoints: dataPoints1,
         axisYType: "secondary",
       },
       {
         type: "line",
+        name: "Body Fat",
         showInLegend: true,
         legendText: "Body Fat [%]",
         dataPoints: dataPoints2,
@@ -208,6 +217,7 @@ Home
       },
       {
         type: "line",
+        name: "Body Water",
         showInLegend: true,
         legendText: "Body Water [%]",
         dataPoints: dataPoints3,
@@ -226,10 +236,6 @@ Home
       dataPoints2.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[3].innerText) });
       dataPoints3.push({ x: new Date(table.rows[row].cells[0].innerText), y: Number(table.rows[row].cells[4].innerText) });
 
-      // dataPoints0.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[1].innerText) });
-      // dataPoints1.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[2].innerText) });
-      // dataPoints2.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[3].innerText) });
-      // dataPoints3.push({ x: row, label: table.rows[row].cells[0].innerText, y: Number(table.rows[row].cells[4].innerText) });
     }
 
     chart.render();
